@@ -1,1 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Журнал монтажника</title>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 25px;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 18px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .main-button {
+      background: #222;
+      color: white;
+      grid-column: span 2;
+    }
+
+    .secondary {
+      background: white;
+      border: 1px solid #ddd;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .time {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .name {
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .info {
+      color: #666;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .empty {
+      text-align: center;
+      color: #888;
+      padding: 30px 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      background: white;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .back {
+      background: #eee;
+      margin-bottom: 15px;
+    }
+
+    .save {
+      background: #222;
+      color: white;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="mainScreen">
+
+    <h1>Журнал монтажника</h1>
+    <div class="subtitle">Клиенты и объекты</div>
+
+    <div class="buttons">
+      <button class="main-button" onclick="showAdd()">
+        ＋ Добавить объект
+      </button>
+
+      <button class="secondary" onclick="showToday()">
+        📅 Сегодня
+      </button>
+
+      <button class="secondary" onclick="showClients()">
+        👥 Клиенты
+      </button>
+    </div>
+
+    <div id="objects"></div>
+
+  </div>
+
+
+  <div id="addScreen" class="hidden">
+
+    <button class="back" onclick="showMain()">← Назад</button>
+
+    <h1>Новый объект</h1>
+
+    <br>
+
+    <input id="name" placeholder="ФИО клиента">
+
+    <input id="phone" type="tel" placeholder="Телефон">
+
+    <input id="address" placeholder="Адрес объекта">
+
+    <input id="date" type="date">
+
+    <input id="time" type="time">
+
+    <select id="type">
+      <option>Видеонаблюдение</option>
+      <option>Домофон</option>
+      <option>Видеонаблюдение + домофон</option>
+      <option>Ремонт / обслуживание</option>
+    </select>
+
+    <textarea id="description"
+      placeholder="Что установлено или что делали"></textarea>
+
+    <input id="price"
+      type="number"
+      placeholder="Стоимость, ₽">
+
+    <select id="payment">
+      <option>Не указано</option>
+      <option>Наличные</option>
+      <option>Перевод</option>
+    </select>
+
+    <button class="save" onclick="saveObject()">
+      Сохранить объект
+    </button>
+
+  </div>
+
+
+  <script>
+
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+
+    let objects = JSON.parse(
+      localStorage.getItem("objects") || "[]"
+    );
+
+
+    function showMain() {
+
+      document.getElementById("mainScreen")
+        .classList.remove("hidden");
+
+      document.getElementById("addScreen")
+        .classList.add("hidden");
+
+      showToday();
+    }
+
+
+    function showAdd() {
+
+      document.getElementById("mainScreen")
+        .classList.add("hidden");
+
+      document.getElementById("addScreen")
+        .classList.remove("hidden");
+
+      document.getElementById("date").value =
+        new Date().toISOString().split("T")[0];
+    }
+
+
+    function saveObject() {
+
+      const object = {
+
+        name: document.getElementById("name").value,
+
+        phone: document.getElementById("phone").value,
+
+        address: document.getElementById("address").value,
+
+        date: document.getElementById("date").value,
+
+        time: document.getElementById("time").value,
+
+        type: document.getElementById("type").value,
+
+        description:
+          document.getElementById("description").value,
+
+        price:
+          document.getElementById("price").value,
+
+        payment:
+          document.getElementById("payment").value
+
+      };
+
+
+      if (!object.name || !object.address) {
+
+        alert("Заполни ФИО и адрес объекта");
+
+        return;
+      }
+
+
+      objects.push(object);
+
+      localStorage.setItem(
+        "objects",
+        JSON.stringify(objects)
+      );
+
+
+      alert("Объект сохранён");
+
+      document.getElementById("name").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("address").value = "";
+      document.getElementById("time").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("price").value = "";
+
+      showMain();
+
+    }
+
+
+    function showToday() {
+
+      const today =
+        new Date().toISOString().split("T")[0];
+
+      const todayObjects =
+        objects.filter(x => x.date === today);
+
+      renderObjects(todayObjects);
+    }
+
+
+    function showClients() {
+
+      renderObjects(objects);
+    }
+
+
+    function renderObjects(list) {
+
+      const container =
+        document.getElementById("objects");
+
+      container.innerHTML = "";
+
+      if (!list.length) {
+
+        container.innerHTML =
+          '<div class="empty">Объектов пока нет</div>';
+
+        return;
+      }
+
+
+      list.forEach(object => {
+
+        const card =
+          document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+
+          <div class="time">
+            ${object.time || "Время не указано"}
+          </div>
+
+          <div class="name">
+            ${object.name}
+          </div>
+
+          <div class="info">
+            📍 ${object.address}<br>
+            📞 ${object.phone || "Телефон не указан"}<br>
+            🔧 ${object.type}<br>
+            📝 ${object.description || "Без описания"}<br>
+            💰 ${object.price ? object.price + " ₽" : "Цена не указана"}<br>
+            💳 ${object.payment}
+          </div>
+
+        `;
+
+        container.appendChild(card);
+
+      });
+
+    }
+
+
+    showToday();
+
+  </script>
+
+</body>
+</html>
