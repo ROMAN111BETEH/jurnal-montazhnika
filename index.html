@@ -306,56 +306,92 @@
 
     function renderObjects(list) {
 
-      const container =
-        document.getElementById("objects");
+  const container = document.getElementById("objects");
 
-      container.innerHTML = "";
+  container.innerHTML = "";
 
-      if (!list.length) {
+  if (!list.length) {
+    container.innerHTML =
+      '<div class="empty">Объектов пока нет</div>';
+    return;
+  }
 
-        container.innerHTML =
-          '<div class="empty">Объектов пока нет</div>';
+  list.forEach((object) => {
 
-        return;
-      }
+    const realIndex = objects.indexOf(object);
 
+    const card = document.createElement("div");
 
-      list.forEach(object => {
+    card.className = "card";
 
-        const card =
-          document.createElement("div");
+    card.innerHTML = `
 
-        card.className = "card";
+      <div class="time">
+        ${object.time || "Время не указано"}
+      </div>
 
-        card.innerHTML = `
+      <div class="name">
+        ${object.name}
+      </div>
 
-          <div class="time">
-            ${object.time || "Время не указано"}
-          </div>
+      <div class="info">
+        📍 ${object.address}<br>
+        📞 ${object.phone || "Телефон не указан"}<br>
+        🔧 ${object.type}<br>
+        📝 ${object.description || "Без описания"}<br>
+        💰 ${object.price ? object.price + " ₽" : "Цена не указана"}<br>
+        💳 ${object.payment}
+      </div>
 
-          <div class="name">
-            ${object.name}
-          </div>
+      <button
+        onclick="deleteObject(${realIndex})"
+        style="
+          margin-top:14px;
+          width:100%;
+          background:#f1f1f1;
+          color:#d11;
+          border:0;
+          border-radius:12px;
+          padding:12px;
+          font-size:15px;
+        "
+      >
+        🗑 Удалить объект
+      </button>
 
-          <div class="info">
-            📍 ${object.address}<br>
-            📞 ${object.phone || "Телефон не указан"}<br>
-            🔧 ${object.type}<br>
-            📝 ${object.description || "Без описания"}<br>
-            💰 ${object.price ? object.price + " ₽" : "Цена не указана"}<br>
-            💳 ${object.payment}
-          </div>
+    `;
 
-        `;
+    container.appendChild(card);
 
-        container.appendChild(card);
+  });
 
-      });
+}
+function deleteObject(index) {
 
-    }
+  const object = objects[index];
 
+  if (!object) {
+    return;
+  }
 
-    showToday();
+  const confirmed = confirm(
+    "Удалить объект " +
+    object.name +
+    "?\n\nЭто действие нельзя отменить."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  objects.splice(index, 1);
+
+  localStorage.setItem(
+    "objects",
+    JSON.stringify(objects)
+  );
+
+  showToday();
 
   </script>
 
