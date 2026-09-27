@@ -30,13 +30,6 @@
       margin-bottom: 18px;
     }
 
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
     button {
       border: 0;
       border-radius: 14px;
@@ -44,6 +37,13 @@
       font-size: 16px;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .main-button {
@@ -85,7 +85,7 @@
     .info {
       color: #666;
       margin-top: 5px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .empty {
@@ -98,7 +98,9 @@
       display: none;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 14px;
       margin-bottom: 10px;
@@ -124,15 +126,13 @@
       width: 100%;
     }
 
-
-    /* =========================
-       КАЛЕНДАРЬ
-       ========================= */
+    /* КАЛЕНДАРЬ */
 
     .calendar-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       margin-bottom: 15px;
     }
 
@@ -149,7 +149,8 @@
       padding: 0;
       background: white;
       border: 1px solid #ddd;
-      font-size: 22px;
+      font-size: 26px;
+      line-height: 44px;
     }
 
     .today-button {
@@ -205,4 +206,1003 @@
 
     .day.selected {
       outline: 2px solid #222;
-      outline-offset: -2
+      outline-offset: -2px;
+    }
+
+    .day.has-object::after {
+      content: "";
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      background: #222;
+      border-radius: 50%;
+    }
+
+    .day.today.has-object::after {
+      background: white;
+    }
+
+    .selected-date-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 20px 0 12px;
+    }
+
+    .calendar-empty {
+      text-align: center;
+      color: #888;
+      padding: 20px 10px;
+      background: white;
+      border-radius: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+
+  <div id="mainScreen">
+
+    <h1>Журнал монтажника</h1>
+
+    <div class="subtitle">
+      Клиенты и объекты
+    </div>
+
+    <div class="buttons">
+
+      <button
+        class="main-button"
+        onclick="showAdd()">
+        ＋ Добавить объект
+      </button>
+
+      <button
+        class="secondary"
+        onclick="showToday()">
+        📅 Сегодня
+      </button>
+
+      <button
+        class="secondary"
+        onclick="showClients()">
+        👥 Клиенты
+      </button>
+
+      <button
+        class="calendar-button"
+        onclick="showCalendar()">
+        🗓 Календарь
+      </button>
+
+    </div>
+
+    <div id="objects"></div>
+
+  </div>
+
+
+  <!-- ДОБАВЛЕНИЕ ОБЪЕКТА -->
+
+  <div id="addScreen" class="hidden">
+
+    <button
+      class="back"
+      onclick="showMain()">
+      ← Назад
+    </button>
+
+    <h1>Новый объект</h1>
+
+    <br>
+
+    <input
+      id="name"
+      placeholder="ФИО клиента">
+
+    <input
+      id="phone"
+      type="tel"
+      placeholder="Телефон">
+
+    <input
+      id="address"
+      placeholder="Адрес объекта">
+
+    <input
+      id="date"
+      type="date">
+
+    <input
+      id="time"
+      type="time">
+
+    <select id="type">
+      <option>Видеонаблюдение</option>
+      <option>Домофон</option>
+      <option>Видеонаблюдение + домофон</option>
+      <option>Ремонт / обслуживание</option>
+    </select>
+
+    <textarea
+      id="description"
+      placeholder="Что установлено или что делали"></textarea>
+
+    <input
+      id="price"
+      type="number"
+      placeholder="Стоимость, ₽">
+
+    <select id="payment">
+      <option>Не указано</option>
+      <option>Наличные</option>
+      <option>Перевод</option>
+    </select>
+
+    <button
+      class="save"
+      onclick="saveObject()">
+      Сохранить объект
+    </button>
+
+  </div>
+
+
+  <!-- КАЛЕНДАРЬ -->
+
+  <div id="calendarScreen" class="hidden">
+
+    <button
+      class="back"
+      onclick="showMain()">
+      ← Назад
+    </button>
+
+    <h1>Календарь</h1>
+
+    <div class="subtitle">
+      Выберите дату
+    </div>
+
+    <div class="calendar-header">
+
+      <button
+        class="month-button"
+        onclick="previousMonth()">
+        ‹
+      </button>
+
+      <div
+        id="calendarTitle"
+        class="calendar-title">
+      </div>
+
+      <button
+        class="month-button"
+        onclick="nextMonth()">
+        ›
+      </button>
+
+    </div>
+
+    <button
+      class="today-button"
+      onclick="goToToday()">
+      📅 Перейти к сегодняшнему дню
+    </button>
+
+    <div class="calendar">
+
+      <div class="weekdays">
+        <div class="weekday">Пн</div>
+        <div class="weekday">Вт</div>
+        <div class="weekday">Ср</div>
+        <div class="weekday">Чт</div>
+        <div class="weekday">Пт</div>
+        <div class="weekday">Сб</div>
+        <div class="weekday">Вс</div>
+      </div>
+
+      <div
+        id="calendarGrid"
+        class="calendar-grid">
+      </div>
+
+    </div>
+
+    <div
+      id="selectedDateTitle"
+      class="selected-date-title">
+    </div>
+
+    <div id="calendarObjects"></div>
+
+  </div>
+
+
+  <script>
+
+    /* TELEGRAM */
+
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+
+    /* ДАННЫЕ */
+
+    let objects = JSON.parse(
+      localStorage.getItem("objects") || "[]"
+    );
+
+
+    /* СОСТОЯНИЕ КАЛЕНДАРЯ */
+
+    let calendarDate = new Date();
+
+    let selectedDate = getToday();
+
+
+    const monthNames = [
+      "Январь",
+      "Февраль",
+      "Март",
+      "Апрель",
+      "Май",
+      "Июнь",
+      "Июль",
+      "Август",
+      "Сентябрь",
+      "Октябрь",
+      "Ноябрь",
+      "Декабрь"
+    ];
+
+
+    /* ДАТА */
+
+    function getToday() {
+
+      const now = new Date();
+
+      return formatDate(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      );
+    }
+
+
+    function formatDate(year, month, day) {
+
+      return year + "-" +
+        String(month + 1).padStart(2, "0") + "-" +
+        String(day).padStart(2, "0");
+    }
+
+
+    function formatDateForTitle(dateString) {
+
+      const parts = dateString.split("-");
+
+      const year = Number(parts[0]);
+      const month = Number(parts[1]) - 1;
+      const day = Number(parts[2]);
+
+      return day + " " +
+        monthNames[month].toLowerCase() +
+        " " +
+        year;
+    }
+
+
+    /* ЭКРАНЫ */
+
+    function hideAllScreens() {
+
+      document
+        .getElementById("mainScreen")
+        .classList.add("hidden");
+
+      document
+        .getElementById("addScreen")
+        .classList.add("hidden");
+
+      document
+        .getElementById("calendarScreen")
+        .classList.add("hidden");
+    }
+
+
+    function showMain() {
+
+      hideAllScreens();
+
+      document
+        .getElementById("mainScreen")
+        .classList.remove("hidden");
+
+      showToday();
+    }
+
+
+    function showAdd() {
+
+      hideAllScreens();
+
+      document
+        .getElementById("addScreen")
+        .classList.remove("hidden");
+
+      document.getElementById("date").value =
+        getToday();
+    }
+
+
+    /* СОХРАНЕНИЕ ОБЪЕКТА */
+
+    function saveObject() {
+
+      const object = {
+
+        name:
+          document.getElementById("name").value,
+
+        phone:
+          document.getElementById("phone").value,
+
+        address:
+          document.getElementById("address").value,
+
+        date:
+          document.getElementById("date").value,
+
+        time:
+          document.getElementById("time").value,
+
+        type:
+          document.getElementById("type").value,
+
+        description:
+          document.getElementById("description").value,
+
+        price:
+          document.getElementById("price").value,
+
+        payment:
+          document.getElementById("payment").value
+      };
+
+
+      if (!object.name || !object.address) {
+
+        alert(
+          "Заполни ФИО и адрес объекта"
+        );
+
+        return;
+      }
+
+
+      objects.push(object);
+
+
+      localStorage.setItem(
+        "objects",
+        JSON.stringify(objects)
+      );
+
+
+      alert("Объект сохранён");
+
+
+      document.getElementById("name").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("address").value = "";
+      document.getElementById("time").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("price").value = "";
+
+
+      showMain();
+    }
+
+
+    /* СЕГОДНЯ */
+
+    function showToday() {
+
+      hideAllScreens();
+
+      document
+        .getElementById("mainScreen")
+        .classList.remove("hidden");
+
+
+      const today = getToday();
+
+      const todayObjects =
+        objects.filter(
+          x => x.date === today
+        );
+
+
+      renderObjects(todayObjects);
+    }
+
+
+    /* КЛИЕНТЫ */
+
+    function showClients() {
+
+      hideAllScreens();
+
+      document
+        .getElementById("mainScreen")
+        .classList.remove("hidden");
+
+
+      renderObjects(objects);
+    }
+
+
+    /* ОТКРЫТЬ КАЛЕНДАРЬ */
+
+    function showCalendar() {
+
+      hideAllScreens();
+
+      document
+        .getElementById("calendarScreen")
+        .classList.remove("hidden");
+
+
+      const now = new Date();
+
+      calendarDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      );
+
+      selectedDate = getToday();
+
+      renderCalendar();
+    }
+
+
+    /* ОТРИСОВКА КАЛЕНДАРЯ */
+
+    function renderCalendar() {
+
+      const year =
+        calendarDate.getFullYear();
+
+      const month =
+        calendarDate.getMonth();
+
+
+      document.getElementById(
+        "calendarTitle"
+      ).textContent =
+        monthNames[month] + " " + year;
+
+
+      const grid =
+        document.getElementById(
+          "calendarGrid"
+        );
+
+
+      grid.innerHTML = "";
+
+
+      let firstDay =
+        new Date(
+          year,
+          month,
+          1
+        ).getDay();
+
+
+      if (firstDay === 0) {
+        firstDay = 7;
+      }
+
+
+      firstDay = firstDay - 1;
+
+
+      const daysInMonth =
+        new Date(
+          year,
+          month + 1,
+          0
+        ).getDate();
+
+
+      const daysInPreviousMonth =
+        new Date(
+          year,
+          month,
+          0
+        ).getDate();
+
+
+      /* ПРЕДЫДУЩИЙ МЕСЯЦ */
+
+      for (
+        let i = firstDay - 1;
+        i >= 0;
+        i--
+      ) {
+
+        const day =
+          daysInPreviousMonth - i;
+
+
+        let previousMonth =
+          month - 1;
+
+        let previousYear =
+          year;
+
+
+        if (previousMonth < 0) {
+          previousMonth = 11;
+          previousYear--;
+        }
+
+
+        const dateString =
+          formatDate(
+            previousYear,
+            previousMonth,
+            day
+          );
+
+
+        createDay(
+          day,
+          dateString,
+          true
+        );
+      }
+
+
+      /* ТЕКУЩИЙ МЕСЯЦ */
+
+      for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+      ) {
+
+        const dateString =
+          formatDate(
+            year,
+            month,
+            day
+          );
+
+
+        createDay(
+          day,
+          dateString,
+          false
+        );
+      }
+
+
+      /* СЛЕДУЮЩИЙ МЕСЯЦ */
+
+      const totalCells =
+        firstDay + daysInMonth;
+
+
+      const remaining =
+        totalCells % 7 === 0
+          ? 0
+          : 7 - (totalCells % 7);
+
+
+      for (
+        let day = 1;
+        day <= remaining;
+        day++
+      ) {
+
+        let nextMonth =
+          month + 1;
+
+        let nextYear =
+          year;
+
+
+        if (nextMonth > 11) {
+          nextMonth = 0;
+          nextYear++;
+        }
+
+
+        const dateString =
+          formatDate(
+            nextYear,
+            nextMonth,
+            day
+          );
+
+
+        createDay(
+          day,
+          dateString,
+          true
+        );
+      }
+
+
+      renderSelectedDate();
+    }
+
+
+    /* СОЗДАНИЕ ДНЯ */
+
+    function createDay(
+      dayNumber,
+      dateString,
+      otherMonth
+    ) {
+
+      const button =
+        document.createElement("button");
+
+
+      button.className = "day";
+
+      button.textContent =
+        dayNumber;
+
+
+      if (otherMonth) {
+        button.classList.add(
+          "other-month"
+        );
+      }
+
+
+      if (dateString === getToday()) {
+        button.classList.add(
+          "today"
+        );
+      }
+
+
+      if (dateString === selectedDate) {
+        button.classList.add(
+          "selected"
+        );
+      }
+
+
+      const hasObject =
+        objects.some(
+          object =>
+            object.date === dateString
+        );
+
+
+      if (hasObject) {
+        button.classList.add(
+          "has-object"
+        );
+      }
+
+
+      button.onclick = function() {
+
+        selectedDate =
+          dateString;
+
+
+        const parts =
+          dateString.split("-");
+
+
+        const clickedYear =
+          Number(parts[0]);
+
+        const clickedMonth =
+          Number(parts[1]) - 1;
+
+
+        calendarDate =
+          new Date(
+            clickedYear,
+            clickedMonth,
+            1
+          );
+
+
+        renderCalendar();
+      };
+
+
+      document
+        .getElementById("calendarGrid")
+        .appendChild(button);
+    }
+
+
+    /* ПРЕДЫДУЩИЙ МЕСЯЦ */
+
+    function previousMonth() {
+
+      calendarDate.setMonth(
+        calendarDate.getMonth() - 1
+      );
+
+      renderCalendar();
+    }
+
+
+    /* СЛЕДУЮЩИЙ МЕСЯЦ */
+
+    function nextMonth() {
+
+      calendarDate.setMonth(
+        calendarDate.getMonth() + 1
+      );
+
+      renderCalendar();
+    }
+
+
+    /* СЕГОДНЯ */
+
+    function goToToday() {
+
+      const now = new Date();
+
+
+      calendarDate =
+        new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1
+        );
+
+
+      selectedDate =
+        getToday();
+
+
+      renderCalendar();
+    }
+
+
+    /* ОБЪЕКТЫ ВЫБРАННОЙ ДАТЫ */
+
+    function renderSelectedDate() {
+
+      document.getElementById(
+        "selectedDateTitle"
+      ).textContent =
+        formatDateForTitle(
+          selectedDate
+        );
+
+
+      const selectedObjects =
+        objects.filter(
+          object =>
+            object.date === selectedDate
+        );
+
+
+      const container =
+        document.getElementById(
+          "calendarObjects"
+        );
+
+
+      container.innerHTML = "";
+
+
+      if (!selectedObjects.length) {
+
+        container.innerHTML =
+          '<div class="calendar-empty">' +
+          'На эту дату объектов нет' +
+          '</div>';
+
+        return;
+      }
+
+
+      renderObjectsInto(
+        selectedObjects,
+        container
+      );
+    }
+
+
+    /* ОТОБРАЖЕНИЕ ОБЪЕКТОВ */
+
+    function renderObjects(list) {
+
+      const container =
+        document.getElementById(
+          "objects"
+        );
+
+
+      renderObjectsInto(
+        list,
+        container
+      );
+    }
+
+
+    function renderObjectsInto(
+      list,
+      container
+    ) {
+
+      container.innerHTML = "";
+
+
+      if (!list.length) {
+
+        container.innerHTML =
+          '<div class="empty">' +
+          'Объектов пока нет' +
+          '</div>';
+
+        return;
+      }
+
+
+      list.forEach(
+        (object) => {
+
+          const realIndex =
+            objects.indexOf(object);
+
+
+          const card =
+            document.createElement("div");
+
+
+          card.className = "card";
+
+
+          card.innerHTML = `
+
+            <div class="time">
+              ${object.time || "Время не указано"}
+            </div>
+
+            <div class="name">
+              ${object.name}
+            </div>
+
+            <div class="info">
+
+              📍 ${object.address}<br>
+
+              📞 ${
+                object.phone ||
+                "Телефон не указан"
+              }<br>
+
+              🔧 ${object.type}<br>
+
+              📝 ${
+                object.description ||
+                "Без описания"
+              }<br>
+
+              💰 ${
+                object.price
+                  ? object.price + " ₽"
+                  : "Цена не указана"
+              }<br>
+
+              💳 ${object.payment}
+
+            </div>
+
+            <button
+              onclick="deleteObject(${realIndex})"
+              style="
+                margin-top:14px;
+                width:100%;
+                background:#f1f1f1;
+                color:#d11;
+                border:0;
+                border-radius:12px;
+                padding:12px;
+                font-size:15px;
+              "
+            >
+              🗑 Удалить объект
+            </button>
+
+          `;
+
+
+          container.appendChild(card);
+        }
+      );
+    }
+
+
+    /* УДАЛЕНИЕ */
+
+    function deleteObject(index) {
+
+      const object =
+        objects[index];
+
+
+      if (!object) {
+        return;
+      }
+
+
+      const confirmed =
+        confirm(
+          "Удалить объект " +
+          object.name +
+          "?\n\n" +
+          "Это действие нельзя отменить."
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      objects.splice(
+        index,
+        1
+      );
+
+
+      localStorage.setItem(
+        "objects",
+        JSON.stringify(objects)
+      );
+
+
+      if (
+        !document
+          .getElementById(
+            "calendarScreen"
+          )
+          .classList.contains("hidden")
+      ) {
+
+        renderCalendar();
+
+      } else {
+
+        showToday();
+      }
+    }
+
+
+    /* ПЕРВОНАЧАЛЬНЫЙ ЗАПУСК */
+
+    showToday();
+
+  </script>
+
+</body>
+</html>
