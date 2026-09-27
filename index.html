@@ -42,6 +42,7 @@
 
     button {
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .app {
@@ -109,7 +110,7 @@
       font-size: 12px;
     }
 
-    /* MAIN BUTTONS */
+    /* MAIN MENU */
 
     .main-menu {
       display: grid;
@@ -284,6 +285,11 @@
     .job-actions .complete {
       background: #e6f7ed;
       color: #228052;
+    }
+
+    .job-actions .delete {
+      background: #ffe9e9;
+      color: #c0392b;
     }
 
     /* CALENDAR */
@@ -511,6 +517,13 @@
       color: white;
     }
 
+    /* CLIENT */
+
+    .client-delete {
+      background: #ffe9e9 !important;
+      color: #c0392b !important;
+    }
+
     @media (min-width: 600px) {
       .modal {
         align-items: center;
@@ -530,12 +543,14 @@
 <div class="app">
 
   <header class="header">
+
     <div>
       <div class="title">Журнал монтажника</div>
       <div class="subtitle" id="hello">Рабочий журнал</div>
     </div>
 
     <div class="avatar" id="avatar">М</div>
+
   </header>
 
   <main id="content"></main>
@@ -546,6 +561,7 @@
 <!-- НИЖНЕЕ МЕНЮ -->
 
 <nav class="bottom-menu">
+
   <div class="bottom-inner">
 
     <button class="bottom-button active" data-page="home">
@@ -569,10 +585,11 @@
     </button>
 
   </div>
+
 </nav>
 
 
-<!-- ОКНО СОЗДАНИЯ МОНТАЖА -->
+<!-- МОДАЛЬНОЕ ОКНО -->
 
 <div class="modal" id="modal">
 
@@ -588,61 +605,38 @@
 
       <label>
         Клиент
-        <input
-          id="name"
-          required
-          placeholder="Имя клиента"
-        >
+        <input id="name" required placeholder="Имя клиента">
       </label>
 
       <div class="form-row">
 
         <label>
           Телефон
-          <input
-            id="phone"
-            type="tel"
-            placeholder="+7..."
-          >
+          <input id="phone" type="tel" placeholder="+7...">
         </label>
 
         <label>
           Стоимость
-          <input
-            id="price"
-            type="number"
-            min="0"
-            placeholder="35000"
-          >
+          <input id="price" type="number" min="0" placeholder="35000">
         </label>
 
       </div>
 
       <label>
         Адрес объекта
-        <input
-          id="address"
-          placeholder="Адрес"
-        >
+        <input id="address" placeholder="Адрес">
       </label>
 
       <div class="form-row">
 
         <label>
           Дата
-          <input
-            id="date"
-            type="date"
-            required
-          >
+          <input id="date" type="date" required>
         </label>
 
         <label>
           Время
-          <input
-            id="time"
-            type="time"
-          >
+          <input id="time" type="time">
         </label>
 
       </div>
@@ -651,13 +645,11 @@
         Тип работы
 
         <select id="type">
-
           <option>Видеонаблюдение</option>
           <option>Домофон</option>
           <option>Видеонаблюдение и домофон</option>
           <option>СКУД</option>
           <option>Другое</option>
-
         </select>
 
       </label>
@@ -676,29 +668,20 @@
         Оплата
 
         <select id="payment">
-
           <option>Наличные</option>
           <option>Перевод</option>
           <option>Не оплачено</option>
-
         </select>
 
       </label>
 
       <div class="modal-buttons">
 
-        <button
-          type="button"
-          class="cancel"
-          id="closeModal"
-        >
+        <button type="button" class="cancel" id="closeModal">
           Отмена
         </button>
 
-        <button
-          type="submit"
-          class="save"
-        >
+        <button type="submit" class="save">
           Сохранить
         </button>
 
@@ -713,9 +696,9 @@
 
 <script>
 
-  /* =========================================
+  /* ===========================
      TELEGRAM
-  ========================================= */
+  =========================== */
 
   const tg = window.Telegram?.WebApp;
 
@@ -725,10 +708,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      ДЕМО-ДАННЫЕ
-     ПОТОМ ЗАМЕНИМ НА SUPABASE
-  ========================================= */
+  =========================== */
 
   let jobs = [
 
@@ -784,9 +766,9 @@
   let selectedDate = null;
 
 
-  /* =========================================
+  /* ===========================
      ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-  ========================================= */
+  =========================== */
 
   function money(value) {
 
@@ -843,9 +825,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      КАРТОЧКА МОНТАЖА
-  ========================================= */
+  =========================== */
 
   function jobCard(job) {
 
@@ -887,11 +869,11 @@
           <div>
 
             <div class="job-name">
-              ${job.name}
+              ${escapeHtml(job.name)}
             </div>
 
             <div class="job-type">
-              ${job.type}
+              ${escapeHtml(job.type)}
             </div>
 
           </div>
@@ -911,16 +893,16 @@
 
           <div>
             📅 ${formatDate(job.date)}
-            ${job.time ? " · " + job.time : ""}
+            ${job.time ? " · " + escapeHtml(job.time) : ""}
           </div>
 
           <div>
-            📍 ${job.address || "Адрес не указан"}
+            📍 ${escapeHtml(job.address || "Адрес не указан")}
           </div>
 
           ${
             job.phone
-              ? `<div>📞 ${job.phone}</div>`
+              ? `<div>📞 ${escapeHtml(job.phone)}</div>`
               : ""
           }
 
@@ -931,7 +913,7 @@
           job.description
             ? `
               <div class="job-description">
-                ${job.description}
+                ${escapeHtml(job.description)}
               </div>
             `
             : ""
@@ -949,27 +931,38 @@
             ✏️ Изменить
           </button>
 
+
           ${
             job.phone
               ? `
-                <button onclick="callClient('${job.phone}')">
+                <button onclick="callClient('${escapeAttribute(job.phone)}')">
                   📞 Позвонить
                 </button>
               `
               : ""
           }
 
+
           ${
             job.address
               ? `
-                <button onclick="openMap('${job.address}')">
+                <button onclick="openMap('${escapeAttribute(job.address)}')">
                   📍 Адрес
                 </button>
               `
               : ""
           }
 
+
           ${nextButton}
+
+
+          <button
+            class="delete"
+            onclick="deleteJob(${job.id})"
+          >
+            🗑️ Удалить
+          </button>
 
         </div>
 
@@ -980,9 +973,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      ГЛАВНАЯ
-  ========================================= */
+  =========================== */
 
   function renderHome() {
 
@@ -1040,10 +1033,9 @@
 
       <div class="main-menu">
 
-        <button
-          class="menu-button new-button"
-          onclick="openNewJob()"
-        >
+        <button class="menu-button new-button"
+          onclick="openNewJob()">
+
           <span class="menu-icon">➕</span>
 
           <span class="menu-title">
@@ -1057,10 +1049,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="openPage('calendar')"
-        >
+        <button class="menu-button"
+          onclick="openPage('calendar')">
+
           <span class="menu-icon">📅</span>
 
           <span class="menu-title">
@@ -1074,10 +1065,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="openPage('jobs')"
-        >
+        <button class="menu-button"
+          onclick="openPage('jobs')">
+
           <span class="menu-icon">📋</span>
 
           <span class="menu-title">
@@ -1091,10 +1081,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="openPage('clients')"
-        >
+        <button class="menu-button"
+          onclick="openPage('clients')">
+
           <span class="menu-icon">👤</span>
 
           <span class="menu-title">
@@ -1108,10 +1097,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="showIncome()"
-        >
+        <button class="menu-button"
+          onclick="showIncome()">
+
           <span class="menu-icon">💰</span>
 
           <span class="menu-title">
@@ -1125,10 +1113,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="openPage('search')"
-        >
+        <button class="menu-button"
+          onclick="openPage('search')">
+
           <span class="menu-icon">🔎</span>
 
           <span class="menu-title">
@@ -1142,10 +1129,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="showStatistics()"
-        >
+        <button class="menu-button"
+          onclick="showStatistics()">
+
           <span class="menu-icon">📊</span>
 
           <span class="menu-title">
@@ -1159,10 +1145,9 @@
         </button>
 
 
-        <button
-          class="menu-button"
-          onclick="showSettings()"
-        >
+        <button class="menu-button"
+          onclick="showSettings()">
+
           <span class="menu-icon">⚙️</span>
 
           <span class="menu-title">
@@ -1198,9 +1183,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      МОНТАЖИ
-  ========================================= */
+  =========================== */
 
   function renderJobs() {
 
@@ -1260,7 +1245,6 @@
           ? list.map(jobCard).join("")
           : `
             <div class="empty">
-
               ${
                 currentStatus === "planned"
                   ? "Запланированных монтажей пока нет"
@@ -1268,7 +1252,6 @@
                     ? "Предстоящих монтажей пока нет"
                     : "Завершённых монтажей пока нет"
               }
-
             </div>
           `
       }
@@ -1278,14 +1261,13 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      КАЛЕНДАРЬ
-  ========================================= */
+  =========================== */
 
   function renderCalendar() {
 
     const year = calendarDate.getFullYear();
-
     const month = calendarDate.getMonth();
 
     const firstDay =
@@ -1294,10 +1276,8 @@
     const lastDay =
       new Date(year, month + 1, 0);
 
-
     const start =
       (firstDay.getDay() + 6) % 7;
-
 
     const monthName =
       calendarDate.toLocaleDateString(
@@ -1312,16 +1292,18 @@
     let days = "";
 
 
-    for(let i = 0; i < start; i++) {
+    for (let i = 0; i < start; i++) {
 
-      days += `
-        <div class="day"></div>
-      `;
+      days += `<div class="day"></div>`;
 
     }
 
 
-    for(let day = 1; day <= lastDay.getDate(); day++) {
+    for (
+      let day = 1;
+      day <= lastDay.getDate();
+      day++
+    ) {
 
       const iso =
         `${year}-${String(month + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
@@ -1483,9 +1465,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      КЛИЕНТЫ
-  ========================================= */
+  =========================== */
 
   function renderClients() {
 
@@ -1498,7 +1480,7 @@
         job.phone || job.name;
 
 
-      if(!clients[key]) {
+      if (!clients[key]) {
 
         clients[key] = {
           name: job.name,
@@ -1534,9 +1516,7 @@
 
 
       <div id="clientsList">
-
         ${clientCards(list)}
-
       </div>
 
     `;
@@ -1546,7 +1526,7 @@
 
   function clientCards(list) {
 
-    if(!list.length) {
+    if (!list.length) {
 
       return `
         <div class="empty">
@@ -1562,14 +1542,14 @@
       <article class="job-card">
 
         <div class="job-name">
-          ${client.name}
+          ${escapeHtml(client.name)}
         </div>
 
         <div class="job-info">
 
           ${
             client.phone
-              ? `<div>📞 ${client.phone}</div>`
+              ? `<div>📞 ${escapeHtml(client.phone)}</div>`
               : ""
           }
 
@@ -1586,7 +1566,7 @@
             client.phone
               ? `
                 <button
-                  onclick="callClient('${client.phone}')"
+                  onclick="callClient('${escapeAttribute(client.phone)}')"
                 >
                   📞 Позвонить
                 </button>
@@ -1596,9 +1576,17 @@
 
 
           <button
-            onclick="showClientHistory('${client.name}')"
+            onclick="showClientHistory('${escapeAttribute(client.name)}')"
           >
             📋 История
+          </button>
+
+
+          <button
+            class="client-delete"
+            onclick="deleteClient('${escapeAttribute(client.phone || client.name)}')"
+          >
+            🗑️ Удалить клиента
           </button>
 
         </div>
@@ -1610,9 +1598,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      НАВИГАЦИЯ
-  ========================================= */
+  =========================== */
 
   function openPage(page) {
 
@@ -1630,34 +1618,24 @@
       });
 
 
-    if(page === "home") {
-
+    if (page === "home") {
       renderHome();
-
     }
 
-    else if(page === "jobs") {
-
+    else if (page === "jobs") {
       renderJobs();
-
     }
 
-    else if(page === "calendar") {
-
+    else if (page === "calendar") {
       renderCalendar();
-
     }
 
-    else if(page === "clients") {
-
+    else if (page === "clients") {
       renderClients();
-
     }
 
-    else if(page === "search") {
-
+    else if (page === "search") {
       renderSearch();
-
     }
 
   }
@@ -1675,9 +1653,9 @@
     });
 
 
-  /* =========================================
+  /* ===========================
      СТАТУСЫ
-  ========================================= */
+  =========================== */
 
   function setStatusFilter(status) {
 
@@ -1685,14 +1663,11 @@
 
     selectedDate = null;
 
-    if(currentPage === "calendar") {
-
+    if (currentPage === "calendar") {
       renderCalendar();
-
-    } else {
-
+    }
+    else {
       renderJobs();
-
     }
 
   }
@@ -1703,11 +1678,40 @@
     const job =
       jobs.find(j => j.id === id);
 
-
-    if(!job) return;
-
+    if (!job) return;
 
     job.status = status;
+
+    renderCurrentPage();
+
+  }
+
+
+  /* ===========================
+     УДАЛЕНИЕ МОНТАЖА
+  =========================== */
+
+  function deleteJob(id) {
+
+    const job =
+      jobs.find(j => j.id === id);
+
+    if (!job) return;
+
+
+    const confirmed = confirm(
+      `Удалить монтаж клиента «${job.name}»?\n\n` +
+      `Дата: ${formatDate(job.date)}\n` +
+      `Адрес: ${job.address || "не указан"}\n\n` +
+      `Это действие нельзя отменить.`
+    );
+
+
+    if (!confirmed) return;
+
+
+    jobs =
+      jobs.filter(j => j.id !== id);
 
 
     renderCurrentPage();
@@ -1715,9 +1719,9 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      КАЛЕНДАРЬ
-  ========================================= */
+  =========================== */
 
   function changeMonth(direction) {
 
@@ -1727,7 +1731,6 @@
         calendarDate.getMonth() + direction,
         1
       );
-
 
     selectedDate = null;
 
@@ -1745,15 +1748,14 @@
   }
 
 
-  /* =========================================
+  /* ===========================
      НОВЫЙ МОНТАЖ
-  ========================================= */
+  =========================== */
 
   function openNewJob() {
 
     document.getElementById("modalTitle").textContent =
       "Новый монтаж";
-
 
     document.getElementById("editId").value = "";
 
@@ -1791,13 +1793,11 @@
     const job =
       jobs.find(j => j.id === id);
 
-
-    if(!job) return;
+    if (!job) return;
 
 
     document.getElementById("modalTitle").textContent =
       "Редактировать монтаж";
-
 
     document.getElementById("editId").value =
       job.id;
@@ -1898,7 +1898,7 @@
         };
 
 
-        if(!data.name || !data.date) {
+        if (!data.name || !data.date) {
 
           alert(
             "Заполните имя клиента и дату монтажа"
@@ -1909,12 +1909,14 @@
         }
 
 
-        if(id) {
+        if (id) {
 
           const job =
             jobs.find(j => j.id == id);
 
-          Object.assign(job, data);
+          if (job) {
+            Object.assign(job, data);
+          }
 
         }
 
@@ -1944,9 +1946,9 @@
     );
 
 
-  /* =========================================
+  /* ===========================
      ПОИСК
-  ========================================= */
+  =========================== */
 
   function renderSearch() {
 
@@ -1966,9 +1968,11 @@
 
 
       <div id="searchResults">
+
         <div class="empty">
           Начни вводить запрос
         </div>
+
       </div>
 
     `;
@@ -2014,9 +2018,168 @@
   }
 
 
-  /* =========================================
+  /* ===========================
+     УДАЛЕНИЕ КЛИЕНТА
+  =========================== */
+
+  function deleteClient(identifier) {
+
+    const client =
+      jobs.find(
+        j => (j.phone || j.name) === identifier
+      );
+
+
+    if (!client) return;
+
+
+    const clientJobs =
+      jobs.filter(
+        j => (j.phone || j.name) === identifier
+      );
+
+
+    const confirmed = confirm(
+
+      `Удалить клиента «${client.name}»?\n\n` +
+
+      `Будет удалено монтажей: ${clientJobs.length}\n\n` +
+
+      `Вместе с ними удалится вся история этого клиента.\n\n` +
+
+      `Это действие нельзя отменить.`
+
+    );
+
+
+    if (!confirmed) return;
+
+
+    jobs =
+      jobs.filter(
+        j => (j.phone || j.name) !== identifier
+      );
+
+
+    renderClients();
+
+  }
+
+
+  function showClientHistory(name) {
+
+    currentStatus = "done";
+    currentPage = "jobs";
+
+
+    document
+      .querySelectorAll(".bottom-button")
+      .forEach(button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page === "jobs"
+        );
+
+      });
+
+
+    const history =
+      jobs.filter(
+        j =>
+          j.name === name &&
+          j.status === "done"
+      );
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        История: ${escapeHtml(name)}
+      </div>
+
+
+      ${
+        history.length
+          ? history.map(jobCard).join("")
+          : `
+            <div class="empty">
+              Завершённых монтажей нет
+            </div>
+          `
+      }
+
+    `;
+
+  }
+
+
+  /* ===========================
+     ФИЛЬТР КЛИЕНТОВ
+  =========================== */
+
+  function filterClients() {
+
+    const query =
+      document
+        .getElementById("clientSearch")
+        .value
+        .toLowerCase();
+
+
+    const clients = {};
+
+
+    jobs.forEach(job => {
+
+      const key =
+        job.phone || job.name;
+
+
+      if (!clients[key]) {
+
+        clients[key] = {
+
+          name: job.name,
+
+          phone: job.phone,
+
+          jobs: []
+
+        };
+
+      }
+
+
+      clients[key].jobs.push(job);
+
+    });
+
+
+    const list =
+      Object.values(clients)
+      .filter(client =>
+
+        (
+          client.name +
+          " " +
+          client.phone
+        )
+        .toLowerCase()
+        .includes(query)
+
+      );
+
+
+    document.getElementById("clientsList").innerHTML =
+      clientCards(list);
+
+  }
+
+
+  /* ===========================
      ПРОЧЕЕ
-  ========================================= */
+  =========================== */
 
   function callClient(phone) {
 
@@ -2060,8 +2223,7 @@
 
   function showStatistics() {
 
-    const total =
-      jobs.length;
+    const total = jobs.length;
 
     const done =
       jobs.filter(j => j.status === "done").length;
@@ -2099,154 +2261,67 @@
   }
 
 
-  function filterClients() {
-
-    const query =
-      document
-        .getElementById("clientSearch")
-        .value
-        .toLowerCase();
-
-
-    const clients = {};
-
-
-    jobs.forEach(job => {
-
-      const key =
-        job.phone || job.name;
-
-
-      if(!clients[key]) {
-
-        clients[key] = {
-
-          name: job.name,
-
-          phone: job.phone,
-
-          jobs: []
-
-        };
-
-      }
-
-
-      clients[key].jobs.push(job);
-
-    });
-
-
-    const list =
-      Object.values(clients)
-      .filter(client =>
-
-        (
-          client.name +
-          " " +
-          client.phone
-        )
-        .toLowerCase()
-        .includes(query)
-
-      );
-
-
-    document.getElementById("clientsList").innerHTML =
-      clientCards(list);
-
-  }
-
-
-  function showClientHistory(name) {
-
-    currentStatus = "done";
-
-    currentPage = "jobs";
-
-
-    document
-      .querySelectorAll(".bottom-button")
-      .forEach(button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.page === "jobs"
-        );
-
-      });
-
-
-    const history =
-      jobs.filter(
-        j =>
-          j.name === name &&
-          j.status === "done"
-      );
-
-
-    document.getElementById("content").innerHTML = `
-
-      <div class="section-title">
-        История: ${name}
-      </div>
-
-
-      ${
-        history.length
-          ? history.map(jobCard).join("")
-          : `
-            <div class="empty">
-              Завершённых монтажей нет
-            </div>
-          `
-      }
-
-    `;
-
-  }
-
+  /* ===========================
+     ТЕКУЩАЯ СТРАНИЦА
+  =========================== */
 
   function renderCurrentPage() {
 
-    if(currentPage === "home") {
-
+    if (currentPage === "home") {
       renderHome();
-
     }
 
-    else if(currentPage === "jobs") {
-
+    else if (currentPage === "jobs") {
       renderJobs();
-
     }
 
-    else if(currentPage === "calendar") {
-
+    else if (currentPage === "calendar") {
       renderCalendar();
-
     }
 
-    else if(currentPage === "clients") {
-
+    else if (currentPage === "clients") {
       renderClients();
-
     }
 
-    else if(currentPage === "search") {
-
+    else if (currentPage === "search") {
       renderSearch();
-
     }
 
   }
 
 
-  /* =========================================
-     TELEGRAM USER
-  ========================================= */
+  /* ===========================
+     БЕЗОПАСНЫЙ ВЫВОД ТЕКСТА
+  =========================== */
 
-  if(tg?.initDataUnsafe?.user) {
+  function escapeHtml(value) {
+
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  function escapeAttribute(value) {
+
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "");
+
+  }
+
+
+  /* ===========================
+     TELEGRAM USER
+  =========================== */
+
+  if (tg?.initDataUnsafe?.user) {
 
     const user =
       tg.initDataUnsafe.user;
@@ -2266,9 +2341,9 @@
   }
 
 
-  /* =========================================
-     СТАРТ
-  ========================================= */
+  /* ===========================
+     ЗАПУСК
+  =========================== */
 
   renderHome();
 
