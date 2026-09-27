@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
   <title>Журнал монтажника</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,1197 +13,2266 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #17202a;
+      --muted: #7b8794;
+      --line: #e4e8ed;
+      --blue: #248cff;
+      --green: #27a866;
+      --orange: #f2a33a;
+      --red: #df6262;
+    }
+
     body {
       margin: 0;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Arial, sans-serif;
     }
 
-    h1 {
-      margin: 0 0 4px;
-      font-size: 25px;
-    }
-
-    .subtitle {
-      color: #777;
-      margin-bottom: 18px;
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
     }
 
     button {
-      border: 0;
-      border-radius: 14px;
-      padding: 15px;
-      font-size: 16px;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    .buttons {
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px 14px 95px;
+    }
+
+    /* HEADER */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .avatar {
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      background: #e8f2ff;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* STATISTICS */
+
+    .stats {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px 10px;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* MAIN BUTTONS */
+
+    .main-menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
       margin-bottom: 18px;
     }
 
-    .main-button {
-      background: #222;
-      color: white;
-      grid-column: span 2;
-    }
-
-    .secondary {
-      background: white;
-      border: 1px solid #ddd;
-    }
-
-    .calendar-button {
-      background: white;
-      border: 1px solid #ddd;
-      grid-column: span 2;
-    }
-
-    .card {
-      background: white;
+    .menu-button {
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      color: var(--text);
+      min-height: 78px;
+    }
+
+    .menu-icon {
+      font-size: 22px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .menu-title {
+      font-weight: 750;
+    }
+
+    .menu-description {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .new-button {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    /* SECTION */
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 18px 0 10px;
+    }
+
+    /* STATUS TABS */
+
+    .status-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      background: #e8ecf0;
+      padding: 4px;
+      border-radius: 13px;
+      margin-bottom: 12px;
+    }
+
+    .status-tab {
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-tab.active {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* JOB CARD */
+
+    .job-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 17px;
       padding: 15px;
       margin-bottom: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
     }
 
-    .time {
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .name {
-      font-size: 17px;
-      font-weight: 600;
-      margin-top: 5px;
-    }
-
-    .info {
-      color: #666;
-      margin-top: 5px;
-      line-height: 1.5;
-    }
-
-    .empty {
-      text-align: center;
-      color: #888;
-      padding: 30px 10px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 16px;
-      background: white;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .back {
-      background: #eee;
-      margin-bottom: 15px;
-    }
-
-    .save {
-      background: #222;
-      color: white;
-      width: 100%;
-    }
-
-    /* КАЛЕНДАРЬ */
-
-    .calendar-header {
+    .job-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 15px;
     }
 
-    .calendar-title {
-      font-size: 20px;
+    .job-name {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .job-type {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .status {
+      padding: 5px 8px;
+      border-radius: 20px;
+      font-size: 11px;
       font-weight: 700;
-      text-align: center;
-      flex: 1;
+      white-space: nowrap;
+      height: fit-content;
     }
 
-    .month-button {
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      background: white;
-      border: 1px solid #ddd;
-      font-size: 26px;
-      line-height: 44px;
+    .status-planned {
+      background: #fff1dc;
+      color: #a86514;
     }
 
-    .today-button {
-      width: 100%;
-      background: white;
-      border: 1px solid #ddd;
-      margin-bottom: 15px;
+    .status-upcoming {
+      background: #e8f2ff;
+      color: #2670c1;
     }
+
+    .status-done {
+      background: #e5f7ed;
+      color: #258253;
+    }
+
+    .job-info {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      color: #4f5b66;
+      font-size: 13px;
+    }
+
+    .job-description {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #68737e;
+    }
+
+    .job-price {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .job-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 13px;
+    }
+
+    .job-actions button {
+      background: #f0f2f4;
+      color: #29333d;
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .job-actions .next {
+      background: #e7f3ff;
+      color: #1675c6;
+    }
+
+    .job-actions .complete {
+      background: #e6f7ed;
+      color: #228052;
+    }
+
+    /* CALENDAR */
 
     .calendar {
       background: white;
-      border-radius: 18px;
-      padding: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 12px;
+      margin-bottom: 12px;
     }
 
-    .weekdays,
-    .calendar-grid {
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .calendar-header button {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      background: #f0f2f4;
+      border-radius: 10px;
+      font-size: 20px;
+    }
+
+    .week {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
     }
 
-    .weekday {
+    .week div {
       text-align: center;
-      color: #888;
-      font-size: 13px;
-      padding: 8px 0;
-      font-weight: 600;
+      font-size: 10px;
+      color: var(--muted);
+      padding: 5px;
+    }
+
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
     }
 
     .day {
+      min-height: 43px;
+      border: 0;
+      border-radius: 9px;
+      background: #fafbfc;
+      font-size: 12px;
       position: relative;
-      height: 48px;
-      margin: 2px;
-      padding: 0;
-      border-radius: 12px;
-      background: transparent;
-      font-size: 15px;
     }
 
-    .day:active {
-      background: #eee;
-    }
-
-    .day.other-month {
-      color: #bbb;
-    }
-
-    .day.today {
-      background: #222;
-      color: white;
+    .day.has-job {
+      background: #edf6ff;
+      color: #1776c4;
+      font-weight: 800;
     }
 
     .day.selected {
-      outline: 2px solid #222;
-      outline-offset: -2px;
+      outline: 2px solid var(--blue);
     }
 
-    .day.has-object::after {
-      content: "";
-      position: absolute;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 5px;
-      height: 5px;
-      background: #222;
+    .day-dot {
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
+      background: var(--blue);
+      margin: 3px auto 0;
     }
 
-    .day.today.has-object::after {
-      background: white;
-    }
+    /* EMPTY */
 
-    .selected-date-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 20px 0 12px;
-    }
-
-    .calendar-empty {
+    .empty {
       text-align: center;
-      color: #888;
-      padding: 20px 10px;
+      color: var(--muted);
       background: white;
+      border: 1px dashed #d7dce1;
       border-radius: 16px;
+      padding: 28px 12px;
+    }
+
+    /* SEARCH */
+
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      padding: 12px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    /* BOTTOM MENU */
+
+    .bottom-menu {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,.97);
+      border-top: 1px solid var(--line);
+      z-index: 20;
+    }
+
+    .bottom-inner {
+      max-width: 760px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 8px env(safe-area-inset-bottom);
+    }
+
+    .bottom-button {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 7px;
+    }
+
+    .bottom-button span {
+      display: block;
+      font-size: 19px;
+      margin-bottom: 2px;
+    }
+
+    .bottom-button.active {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    /* MODAL */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: flex-end;
+      z-index: 50;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 760px;
+      margin: auto auto 0;
+      border-radius: 22px 22px 0 0;
+      padding: 18px;
+      max-height: 92%;
+      overflow-y: auto;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    .form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .form input,
+    .form select,
+    .form textarea {
+      width: 100%;
+      margin-top: 5px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fafbfc;
+      color: var(--text);
+      outline: none;
+    }
+
+    .form textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .modal-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .modal-buttons button {
+      padding: 13px;
+      border-radius: 12px;
+      border: 0;
+      font-weight: 800;
+    }
+
+    .cancel {
+      background: #eef0f2;
+    }
+
+    .save {
+      background: var(--blue);
+      color: white;
+    }
+
+    @media (min-width: 600px) {
+      .modal {
+        align-items: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        border-radius: 20px;
+        margin: auto;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ГЛАВНЫЙ ЭКРАН -->
+<div class="app">
 
-  <div id="mainScreen">
-
-    <h1>Журнал монтажника</h1>
-
-    <div class="subtitle">
-      Клиенты и объекты
+  <header class="header">
+    <div>
+      <div class="title">Журнал монтажника</div>
+      <div class="subtitle" id="hello">Рабочий журнал</div>
     </div>
 
-    <div class="buttons">
+    <div class="avatar" id="avatar">М</div>
+  </header>
 
-      <button
-        class="main-button"
-        onclick="showAdd()">
-        ＋ Добавить объект
-      </button>
+  <main id="content"></main>
 
-      <button
-        class="secondary"
-        onclick="showToday()">
-        📅 Сегодня
-      </button>
-
-      <button
-        class="secondary"
-        onclick="showClients()">
-        👥 Клиенты
-      </button>
-
-      <button
-        class="calendar-button"
-        onclick="showCalendar()">
-        🗓 Календарь
-      </button>
-
-    </div>
-
-    <div id="objects"></div>
-
-  </div>
+</div>
 
 
-  <!-- ДОБАВЛЕНИЕ ОБЪЕКТА -->
+<!-- НИЖНЕЕ МЕНЮ -->
 
-  <div id="addScreen" class="hidden">
+<nav class="bottom-menu">
+  <div class="bottom-inner">
 
-    <button
-      class="back"
-      onclick="showMain()">
-      ← Назад
+    <button class="bottom-button active" data-page="home">
+      <span>🏠</span>
+      Главная
     </button>
 
-    <h1>Новый объект</h1>
+    <button class="bottom-button" data-page="calendar">
+      <span>📅</span>
+      Календарь
+    </button>
 
-    <br>
+    <button class="bottom-button" data-page="jobs">
+      <span>📋</span>
+      Монтажи
+    </button>
 
-    <input
-      id="name"
-      placeholder="ФИО клиента">
-
-    <input
-      id="phone"
-      type="tel"
-      placeholder="Телефон">
-
-    <input
-      id="address"
-      placeholder="Адрес объекта">
-
-    <input
-      id="date"
-      type="date">
-
-    <input
-      id="time"
-      type="time">
-
-    <select id="type">
-      <option>Видеонаблюдение</option>
-      <option>Домофон</option>
-      <option>Видеонаблюдение + домофон</option>
-      <option>Ремонт / обслуживание</option>
-    </select>
-
-    <textarea
-      id="description"
-      placeholder="Что установлено или что делали"></textarea>
-
-    <input
-      id="price"
-      type="number"
-      placeholder="Стоимость, ₽">
-
-    <select id="payment">
-      <option>Не указано</option>
-      <option>Наличные</option>
-      <option>Перевод</option>
-    </select>
-
-    <button
-      class="save"
-      onclick="saveObject()">
-      Сохранить объект
+    <button class="bottom-button" data-page="clients">
+      <span>👤</span>
+      Клиенты
     </button>
 
   </div>
+</nav>
 
 
-  <!-- КАЛЕНДАРЬ -->
+<!-- ОКНО СОЗДАНИЯ МОНТАЖА -->
 
-  <div id="calendarScreen" class="hidden">
+<div class="modal" id="modal">
 
-    <button
-      class="back"
-      onclick="showMain()">
-      ← Назад
-    </button>
+  <div class="modal-content">
 
-    <h1>Календарь</h1>
-
-    <div class="subtitle">
-      Выберите дату
+    <div class="modal-title" id="modalTitle">
+      Новый монтаж
     </div>
 
-    <div class="calendar-header">
+    <form class="form" id="jobForm">
 
-      <button
-        class="month-button"
-        onclick="previousMonth()">
-        ‹
-      </button>
+      <input type="hidden" id="editId">
 
-      <div
-        id="calendarTitle"
-        class="calendar-title">
+      <label>
+        Клиент
+        <input
+          id="name"
+          required
+          placeholder="Имя клиента"
+        >
+      </label>
+
+      <div class="form-row">
+
+        <label>
+          Телефон
+          <input
+            id="phone"
+            type="tel"
+            placeholder="+7..."
+          >
+        </label>
+
+        <label>
+          Стоимость
+          <input
+            id="price"
+            type="number"
+            min="0"
+            placeholder="35000"
+          >
+        </label>
+
       </div>
 
-      <button
-        class="month-button"
-        onclick="nextMonth()">
-        ›
-      </button>
+      <label>
+        Адрес объекта
+        <input
+          id="address"
+          placeholder="Адрес"
+        >
+      </label>
 
-    </div>
+      <div class="form-row">
 
-    <button
-      class="today-button"
-      onclick="goToToday()">
-      📅 Перейти к сегодняшнему дню
-    </button>
+        <label>
+          Дата
+          <input
+            id="date"
+            type="date"
+            required
+          >
+        </label>
 
-    <div class="calendar">
+        <label>
+          Время
+          <input
+            id="time"
+            type="time"
+          >
+        </label>
 
-      <div class="weekdays">
-        <div class="weekday">Пн</div>
-        <div class="weekday">Вт</div>
-        <div class="weekday">Ср</div>
-        <div class="weekday">Чт</div>
-        <div class="weekday">Пт</div>
-        <div class="weekday">Сб</div>
-        <div class="weekday">Вс</div>
       </div>
 
-      <div
-        id="calendarGrid"
-        class="calendar-grid">
+      <label>
+        Тип работы
+
+        <select id="type">
+
+          <option>Видеонаблюдение</option>
+          <option>Домофон</option>
+          <option>Видеонаблюдение и домофон</option>
+          <option>СКУД</option>
+          <option>Другое</option>
+
+        </select>
+
+      </label>
+
+      <label>
+        Описание
+
+        <textarea
+          id="description"
+          placeholder="Что необходимо сделать"
+        ></textarea>
+
+      </label>
+
+      <label>
+        Оплата
+
+        <select id="payment">
+
+          <option>Наличные</option>
+          <option>Перевод</option>
+          <option>Не оплачено</option>
+
+        </select>
+
+      </label>
+
+      <div class="modal-buttons">
+
+        <button
+          type="button"
+          class="cancel"
+          id="closeModal"
+        >
+          Отмена
+        </button>
+
+        <button
+          type="submit"
+          class="save"
+        >
+          Сохранить
+        </button>
+
       </div>
 
-    </div>
-
-    <div
-      id="selectedDateTitle"
-      class="selected-date-title">
-    </div>
-
-    <div id="calendarObjects"></div>
+    </form>
 
   </div>
 
+</div>
 
-  <script>
 
-    /* TELEGRAM */
+<script>
 
-    const tg = window.Telegram.WebApp;
+  /* =========================================
+     TELEGRAM
+  ========================================= */
 
+  const tg = window.Telegram?.WebApp;
+
+  if (tg) {
     tg.ready();
     tg.expand();
+  }
 
 
-    /* ДАННЫЕ */
+  /* =========================================
+     ДЕМО-ДАННЫЕ
+     ПОТОМ ЗАМЕНИМ НА SUPABASE
+  ========================================= */
 
-    let objects = JSON.parse(
-      localStorage.getItem("objects") || "[]"
+  let jobs = [
+
+    {
+      id: 1,
+      name: "Иван Петров",
+      phone: "+7 900 000-00-01",
+      address: "ул. Ленина, 15",
+      date: "2026-09-28",
+      time: "10:00",
+      type: "Видеонаблюдение",
+      description: "Установка 4 камер и регистратора",
+      price: 35000,
+      payment: "Не оплачено",
+      status: "planned"
+    },
+
+    {
+      id: 2,
+      name: "ООО Вектор",
+      phone: "+7 900 000-00-02",
+      address: "ул. Советская, 24",
+      date: "2026-09-29",
+      time: "14:30",
+      type: "Видеонаблюдение и домофон",
+      description: "Монтаж системы на входе",
+      price: 48000,
+      payment: "Перевод",
+      status: "upcoming"
+    },
+
+    {
+      id: 3,
+      name: "Сергей",
+      phone: "+7 900 000-00-03",
+      address: "ул. Кирова, 8",
+      date: "2026-09-25",
+      time: "09:30",
+      type: "Домофон",
+      description: "Замена и настройка",
+      price: 18000,
+      payment: "Наличные",
+      status: "done"
+    }
+
+  ];
+
+
+  let currentPage = "home";
+  let currentStatus = "planned";
+
+  let calendarDate = new Date();
+  let selectedDate = null;
+
+
+  /* =========================================
+     ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  ========================================= */
+
+  function money(value) {
+
+    return Number(value || 0)
+      .toLocaleString("ru-RU") + " ₽";
+
+  }
+
+
+  function formatDate(date) {
+
+    if (!date) return "";
+
+    return new Date(date + "T00:00:00")
+      .toLocaleDateString(
+        "ru-RU",
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+  }
+
+
+  function statusName(status) {
+
+    if (status === "planned") {
+      return "Запланировано";
+    }
+
+    if (status === "upcoming") {
+      return "Предстоящий монтаж";
+    }
+
+    return "Монтаж завершён";
+
+  }
+
+
+  function statusClass(status) {
+
+    if (status === "planned") {
+      return "status-planned";
+    }
+
+    if (status === "upcoming") {
+      return "status-upcoming";
+    }
+
+    return "status-done";
+
+  }
+
+
+  /* =========================================
+     КАРТОЧКА МОНТАЖА
+  ========================================= */
+
+  function jobCard(job) {
+
+    let nextButton = "";
+
+    if (job.status === "planned") {
+
+      nextButton = `
+        <button
+          class="next"
+          onclick="changeStatus(${job.id}, 'upcoming')"
+        >
+          → В предстоящие
+        </button>
+      `;
+
+    }
+
+    if (job.status === "upcoming") {
+
+      nextButton = `
+        <button
+          class="complete"
+          onclick="changeStatus(${job.id}, 'done')"
+        >
+          ✓ Завершить
+        </button>
+      `;
+
+    }
+
+
+    return `
+
+      <article class="job-card">
+
+        <div class="job-header">
+
+          <div>
+
+            <div class="job-name">
+              ${job.name}
+            </div>
+
+            <div class="job-type">
+              ${job.type}
+            </div>
+
+          </div>
+
+          <div class="status ${statusClass(job.status)}">
+
+            ${job.status === "done" ? "✓ " : ""}
+
+            ${statusName(job.status)}
+
+          </div>
+
+        </div>
+
+
+        <div class="job-info">
+
+          <div>
+            📅 ${formatDate(job.date)}
+            ${job.time ? " · " + job.time : ""}
+          </div>
+
+          <div>
+            📍 ${job.address || "Адрес не указан"}
+          </div>
+
+          ${
+            job.phone
+              ? `<div>📞 ${job.phone}</div>`
+              : ""
+          }
+
+        </div>
+
+
+        ${
+          job.description
+            ? `
+              <div class="job-description">
+                ${job.description}
+              </div>
+            `
+            : ""
+        }
+
+
+        <div class="job-price">
+          💰 ${money(job.price)}
+        </div>
+
+
+        <div class="job-actions">
+
+          <button onclick="editJob(${job.id})">
+            ✏️ Изменить
+          </button>
+
+          ${
+            job.phone
+              ? `
+                <button onclick="callClient('${job.phone}')">
+                  📞 Позвонить
+                </button>
+              `
+              : ""
+          }
+
+          ${
+            job.address
+              ? `
+                <button onclick="openMap('${job.address}')">
+                  📍 Адрес
+                </button>
+              `
+              : ""
+          }
+
+          ${nextButton}
+
+        </div>
+
+      </article>
+
+    `;
+
+  }
+
+
+  /* =========================================
+     ГЛАВНАЯ
+  ========================================= */
+
+  function renderHome() {
+
+    const planned =
+      jobs.filter(j => j.status === "planned").length;
+
+    const upcoming =
+      jobs.filter(j => j.status === "upcoming").length;
+
+    const done =
+      jobs.filter(j => j.status === "done").length;
+
+
+    const doneMoney =
+      jobs
+        .filter(j => j.status === "done")
+        .reduce(
+          (sum, j) => sum + Number(j.price || 0),
+          0
+        );
+
+
+    const upcomingJobs =
+      jobs
+        .filter(j => j.status !== "done")
+        .sort(
+          (a,b) =>
+            (a.date + a.time)
+            .localeCompare(b.date + b.time)
+        )
+        .slice(0,3);
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="stats">
+
+        <div class="stat">
+          <span class="stat-number">${planned}</span>
+          <span class="stat-label">Запланировано</span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-number">${upcoming}</span>
+          <span class="stat-label">Предстоящие</span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-number">${done}</span>
+          <span class="stat-label">Завершено</span>
+        </div>
+
+      </div>
+
+
+      <div class="main-menu">
+
+        <button
+          class="menu-button new-button"
+          onclick="openNewJob()"
+        >
+          <span class="menu-icon">➕</span>
+
+          <span class="menu-title">
+            Новый монтаж
+          </span>
+
+          <span class="menu-description">
+            Добавить новую работу
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="openPage('calendar')"
+        >
+          <span class="menu-icon">📅</span>
+
+          <span class="menu-title">
+            Календарь
+          </span>
+
+          <span class="menu-description">
+            Монтажи по датам
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="openPage('jobs')"
+        >
+          <span class="menu-icon">📋</span>
+
+          <span class="menu-title">
+            Все монтажи
+          </span>
+
+          <span class="menu-description">
+            Запланированные и завершённые
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="openPage('clients')"
+        >
+          <span class="menu-icon">👤</span>
+
+          <span class="menu-title">
+            Клиенты
+          </span>
+
+          <span class="menu-description">
+            Контакты и история
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="showIncome()"
+        >
+          <span class="menu-icon">💰</span>
+
+          <span class="menu-title">
+            Доходы
+          </span>
+
+          <span class="menu-description">
+            ${money(doneMoney)}
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="openPage('search')"
+        >
+          <span class="menu-icon">🔎</span>
+
+          <span class="menu-title">
+            Поиск
+          </span>
+
+          <span class="menu-description">
+            Клиент, адрес, телефон
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="showStatistics()"
+        >
+          <span class="menu-icon">📊</span>
+
+          <span class="menu-title">
+            Статистика
+          </span>
+
+          <span class="menu-description">
+            Работа за период
+          </span>
+
+        </button>
+
+
+        <button
+          class="menu-button"
+          onclick="showSettings()"
+        >
+          <span class="menu-icon">⚙️</span>
+
+          <span class="menu-title">
+            Настройки
+          </span>
+
+          <span class="menu-description">
+            Параметры приложения
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <div class="section-title">
+        Ближайшие монтажи
+      </div>
+
+
+      ${
+        upcomingJobs.length
+          ? upcomingJobs.map(jobCard).join("")
+          : `
+            <div class="empty">
+              Пока нет предстоящих монтажей
+            </div>
+          `
+      }
+
+    `;
+
+  }
+
+
+  /* =========================================
+     МОНТАЖИ
+  ========================================= */
+
+  function renderJobs() {
+
+    const list =
+      jobs
+        .filter(j => j.status === currentStatus)
+        .sort(
+          (a,b) =>
+            (a.date + a.time)
+            .localeCompare(b.date + b.time)
+        );
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        Монтажи
+      </div>
+
+
+      <div class="status-tabs">
+
+        <button
+          class="status-tab ${
+            currentStatus === "planned" ? "active" : ""
+          }"
+          onclick="setStatusFilter('planned')"
+        >
+          Запланировано
+        </button>
+
+
+        <button
+          class="status-tab ${
+            currentStatus === "upcoming" ? "active" : ""
+          }"
+          onclick="setStatusFilter('upcoming')"
+        >
+          Предстоящие
+        </button>
+
+
+        <button
+          class="status-tab ${
+            currentStatus === "done" ? "active" : ""
+          }"
+          onclick="setStatusFilter('done')"
+        >
+          Завершённые
+        </button>
+
+      </div>
+
+
+      ${
+        list.length
+          ? list.map(jobCard).join("")
+          : `
+            <div class="empty">
+
+              ${
+                currentStatus === "planned"
+                  ? "Запланированных монтажей пока нет"
+                  : currentStatus === "upcoming"
+                    ? "Предстоящих монтажей пока нет"
+                    : "Завершённых монтажей пока нет"
+              }
+
+            </div>
+          `
+      }
+
+    `;
+
+  }
+
+
+  /* =========================================
+     КАЛЕНДАРЬ
+  ========================================= */
+
+  function renderCalendar() {
+
+    const year = calendarDate.getFullYear();
+
+    const month = calendarDate.getMonth();
+
+    const firstDay =
+      new Date(year, month, 1);
+
+    const lastDay =
+      new Date(year, month + 1, 0);
+
+
+    const start =
+      (firstDay.getDay() + 6) % 7;
+
+
+    const monthName =
+      calendarDate.toLocaleDateString(
+        "ru-RU",
+        {
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+
+    let days = "";
+
+
+    for(let i = 0; i < start; i++) {
+
+      days += `
+        <div class="day"></div>
+      `;
+
+    }
+
+
+    for(let day = 1; day <= lastDay.getDate(); day++) {
+
+      const iso =
+        `${year}-${String(month + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+
+      const hasJob =
+        jobs.some(
+          j =>
+            j.date === iso &&
+            j.status === currentStatus
+        );
+
+
+      days += `
+
+        <button
+          class="day ${
+            hasJob ? "has-job" : ""
+          } ${
+            selectedDate === iso ? "selected" : ""
+          }"
+          onclick="selectCalendarDate('${iso}')"
+        >
+
+          ${day}
+
+          ${
+            hasJob
+              ? `<div class="day-dot"></div>`
+              : ""
+          }
+
+        </button>
+
+      `;
+
+    }
+
+
+    const selectedJobs =
+      selectedDate
+        ? jobs.filter(
+            j =>
+              j.date === selectedDate &&
+              j.status === currentStatus
+          )
+        : [];
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        ${statusName(currentStatus)}
+      </div>
+
+
+      <div class="status-tabs">
+
+        <button
+          class="status-tab ${
+            currentStatus === "planned" ? "active" : ""
+          }"
+          onclick="setStatusFilter('planned')"
+        >
+          Запланировано
+        </button>
+
+        <button
+          class="status-tab ${
+            currentStatus === "upcoming" ? "active" : ""
+          }"
+          onclick="setStatusFilter('upcoming')"
+        >
+          Предстоящие
+        </button>
+
+        <button
+          class="status-tab ${
+            currentStatus === "done" ? "active" : ""
+          }"
+          onclick="setStatusFilter('done')"
+        >
+          Завершённые
+        </button>
+
+      </div>
+
+
+      <div class="calendar">
+
+        <div class="calendar-header">
+
+          <button onclick="changeMonth(-1)">
+            ‹
+          </button>
+
+          <span>
+            ${
+              monthName.charAt(0).toUpperCase()
+              + monthName.slice(1)
+            }
+          </span>
+
+          <button onclick="changeMonth(1)">
+            ›
+          </button>
+
+        </div>
+
+
+        <div class="week">
+
+          <div>Пн</div>
+          <div>Вт</div>
+          <div>Ср</div>
+          <div>Чт</div>
+          <div>Пт</div>
+          <div>Сб</div>
+          <div>Вс</div>
+
+        </div>
+
+
+        <div class="days">
+          ${days}
+        </div>
+
+      </div>
+
+
+      ${
+        selectedDate
+          ? `
+
+            <div class="section-title">
+              ${formatDate(selectedDate)}
+            </div>
+
+            ${
+              selectedJobs.length
+                ? selectedJobs.map(jobCard).join("")
+                : `
+                  <div class="empty">
+                    На эту дату монтажей нет
+                  </div>
+                `
+            }
+
+          `
+          : `
+            <div class="empty">
+              Выбери дату в календаре
+            </div>
+          `
+      }
+
+    `;
+
+  }
+
+
+  /* =========================================
+     КЛИЕНТЫ
+  ========================================= */
+
+  function renderClients() {
+
+    const clients = {};
+
+
+    jobs.forEach(job => {
+
+      const key =
+        job.phone || job.name;
+
+
+      if(!clients[key]) {
+
+        clients[key] = {
+          name: job.name,
+          phone: job.phone,
+          jobs: []
+        };
+
+      }
+
+
+      clients[key].jobs.push(job);
+
+    });
+
+
+    const list =
+      Object.values(clients);
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        Клиенты
+      </div>
+
+
+      <input
+        class="search"
+        id="clientSearch"
+        placeholder="Поиск клиента..."
+        oninput="filterClients()"
+      >
+
+
+      <div id="clientsList">
+
+        ${clientCards(list)}
+
+      </div>
+
+    `;
+
+  }
+
+
+  function clientCards(list) {
+
+    if(!list.length) {
+
+      return `
+        <div class="empty">
+          Клиентов пока нет
+        </div>
+      `;
+
+    }
+
+
+    return list.map(client => `
+
+      <article class="job-card">
+
+        <div class="job-name">
+          ${client.name}
+        </div>
+
+        <div class="job-info">
+
+          ${
+            client.phone
+              ? `<div>📞 ${client.phone}</div>`
+              : ""
+          }
+
+          <div>
+            📋 Монтажей: ${client.jobs.length}
+          </div>
+
+        </div>
+
+
+        <div class="job-actions">
+
+          ${
+            client.phone
+              ? `
+                <button
+                  onclick="callClient('${client.phone}')"
+                >
+                  📞 Позвонить
+                </button>
+              `
+              : ""
+          }
+
+
+          <button
+            onclick="showClientHistory('${client.name}')"
+          >
+            📋 История
+          </button>
+
+        </div>
+
+      </article>
+
+    `).join("");
+
+  }
+
+
+  /* =========================================
+     НАВИГАЦИЯ
+  ========================================= */
+
+  function openPage(page) {
+
+    currentPage = page;
+
+    document
+      .querySelectorAll(".bottom-button")
+      .forEach(button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page === page
+        );
+
+      });
+
+
+    if(page === "home") {
+
+      renderHome();
+
+    }
+
+    else if(page === "jobs") {
+
+      renderJobs();
+
+    }
+
+    else if(page === "calendar") {
+
+      renderCalendar();
+
+    }
+
+    else if(page === "clients") {
+
+      renderClients();
+
+    }
+
+    else if(page === "search") {
+
+      renderSearch();
+
+    }
+
+  }
+
+
+  document
+    .querySelectorAll(".bottom-button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => openPage(button.dataset.page)
+      );
+
+    });
+
+
+  /* =========================================
+     СТАТУСЫ
+  ========================================= */
+
+  function setStatusFilter(status) {
+
+    currentStatus = status;
+
+    selectedDate = null;
+
+    if(currentPage === "calendar") {
+
+      renderCalendar();
+
+    } else {
+
+      renderJobs();
+
+    }
+
+  }
+
+
+  function changeStatus(id, status) {
+
+    const job =
+      jobs.find(j => j.id === id);
+
+
+    if(!job) return;
+
+
+    job.status = status;
+
+
+    renderCurrentPage();
+
+  }
+
+
+  /* =========================================
+     КАЛЕНДАРЬ
+  ========================================= */
+
+  function changeMonth(direction) {
+
+    calendarDate =
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth() + direction,
+        1
+      );
+
+
+    selectedDate = null;
+
+    renderCalendar();
+
+  }
+
+
+  function selectCalendarDate(date) {
+
+    selectedDate = date;
+
+    renderCalendar();
+
+  }
+
+
+  /* =========================================
+     НОВЫЙ МОНТАЖ
+  ========================================= */
+
+  function openNewJob() {
+
+    document.getElementById("modalTitle").textContent =
+      "Новый монтаж";
+
+
+    document.getElementById("editId").value = "";
+
+    document.getElementById("name").value = "";
+
+    document.getElementById("phone").value = "";
+
+    document.getElementById("address").value = "";
+
+    document.getElementById("date").value =
+      new Date().toISOString().slice(0,10);
+
+    document.getElementById("time").value = "";
+
+    document.getElementById("type").value =
+      "Видеонаблюдение";
+
+    document.getElementById("description").value = "";
+
+    document.getElementById("price").value = "";
+
+    document.getElementById("payment").value =
+      "Не оплачено";
+
+
+    document
+      .getElementById("modal")
+      .classList.add("open");
+
+  }
+
+
+  function editJob(id) {
+
+    const job =
+      jobs.find(j => j.id === id);
+
+
+    if(!job) return;
+
+
+    document.getElementById("modalTitle").textContent =
+      "Редактировать монтаж";
+
+
+    document.getElementById("editId").value =
+      job.id;
+
+    document.getElementById("name").value =
+      job.name;
+
+    document.getElementById("phone").value =
+      job.phone;
+
+    document.getElementById("address").value =
+      job.address;
+
+    document.getElementById("date").value =
+      job.date;
+
+    document.getElementById("time").value =
+      job.time;
+
+    document.getElementById("type").value =
+      job.type;
+
+    document.getElementById("description").value =
+      job.description;
+
+    document.getElementById("price").value =
+      job.price;
+
+    document.getElementById("payment").value =
+      job.payment;
+
+
+    document
+      .getElementById("modal")
+      .classList.add("open");
+
+  }
+
+
+  document
+    .getElementById("closeModal")
+    .addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById("modal")
+          .classList.remove("open");
+
+      }
     );
 
 
-    /* СОСТОЯНИЕ КАЛЕНДАРЯ */
+  document
+    .getElementById("jobForm")
+    .addEventListener(
+      "submit",
+      function(event) {
 
-    let calendarDate = new Date();
-
-    let selectedDate = getToday();
-
-
-    const monthNames = [
-      "Январь",
-      "Февраль",
-      "Март",
-      "Апрель",
-      "Май",
-      "Июнь",
-      "Июль",
-      "Август",
-      "Сентябрь",
-      "Октябрь",
-      "Ноябрь",
-      "Декабрь"
-    ];
+        event.preventDefault();
 
 
-    /* ДАТА */
-
-    function getToday() {
-
-      const now = new Date();
-
-      return formatDate(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-      );
-    }
+        const id =
+          document.getElementById("editId").value;
 
 
-    function formatDate(year, month, day) {
+        const data = {
 
-      return year + "-" +
-        String(month + 1).padStart(2, "0") + "-" +
-        String(day).padStart(2, "0");
-    }
+          name:
+            document.getElementById("name").value.trim(),
 
+          phone:
+            document.getElementById("phone").value.trim(),
 
-    function formatDateForTitle(dateString) {
+          address:
+            document.getElementById("address").value.trim(),
 
-      const parts = dateString.split("-");
+          date:
+            document.getElementById("date").value,
 
-      const year = Number(parts[0]);
-      const month = Number(parts[1]) - 1;
-      const day = Number(parts[2]);
+          time:
+            document.getElementById("time").value,
 
-      return day + " " +
-        monthNames[month].toLowerCase() +
-        " " +
-        year;
-    }
+          type:
+            document.getElementById("type").value,
 
+          description:
+            document.getElementById("description").value.trim(),
 
-    /* ЭКРАНЫ */
+          price:
+            Number(
+              document.getElementById("price").value || 0
+            ),
 
-    function hideAllScreens() {
+          payment:
+            document.getElementById("payment").value
 
-      document
-        .getElementById("mainScreen")
-        .classList.add("hidden");
-
-      document
-        .getElementById("addScreen")
-        .classList.add("hidden");
-
-      document
-        .getElementById("calendarScreen")
-        .classList.add("hidden");
-    }
+        };
 
 
-    function showMain() {
+        if(!data.name || !data.date) {
 
-      hideAllScreens();
+          alert(
+            "Заполните имя клиента и дату монтажа"
+          );
 
-      document
-        .getElementById("mainScreen")
-        .classList.remove("hidden");
+          return;
 
-      showToday();
-    }
-
-
-    function showAdd() {
-
-      hideAllScreens();
-
-      document
-        .getElementById("addScreen")
-        .classList.remove("hidden");
-
-      document.getElementById("date").value =
-        getToday();
-    }
+        }
 
 
-    /* СОХРАНЕНИЕ ОБЪЕКТА */
+        if(id) {
 
-    function saveObject() {
+          const job =
+            jobs.find(j => j.id == id);
 
-      const object = {
+          Object.assign(job, data);
 
-        name:
-          document.getElementById("name").value,
+        }
 
-        phone:
-          document.getElementById("phone").value,
+        else {
 
-        address:
-          document.getElementById("address").value,
+          jobs.push({
 
-        date:
-          document.getElementById("date").value,
+            id: Date.now(),
 
-        time:
-          document.getElementById("time").value,
+            ...data,
 
-        type:
-          document.getElementById("type").value,
+            status: "planned"
 
-        description:
-          document.getElementById("description").value,
+          });
 
-        price:
-          document.getElementById("price").value,
-
-        payment:
-          document.getElementById("payment").value
-      };
+        }
 
 
-      if (!object.name || !object.address) {
+        document
+          .getElementById("modal")
+          .classList.remove("open");
 
-        alert(
-          "Заполни ФИО и адрес объекта"
-        );
 
-        return;
+        renderCurrentPage();
+
       }
+    );
 
 
-      objects.push(object);
+  /* =========================================
+     ПОИСК
+  ========================================= */
+
+  function renderSearch() {
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        Поиск монтажей
+      </div>
 
 
-      localStorage.setItem(
-        "objects",
-        JSON.stringify(objects)
+      <input
+        class="search"
+        id="globalSearch"
+        placeholder="Клиент, телефон, адрес..."
+        oninput="performSearch()"
+      >
+
+
+      <div id="searchResults">
+        <div class="empty">
+          Начни вводить запрос
+        </div>
+      </div>
+
+    `;
+
+  }
+
+
+  function performSearch() {
+
+    const query =
+      document
+        .getElementById("globalSearch")
+        .value
+        .toLowerCase();
+
+
+    const results =
+      jobs.filter(job =>
+
+        [
+          job.name,
+          job.phone,
+          job.address,
+          job.type,
+          job.description
+        ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+
       );
 
 
-      alert("Объект сохранён");
+    document.getElementById("searchResults").innerHTML =
+      results.length
+        ? results.map(jobCard).join("")
+        : `
+          <div class="empty">
+            Ничего не найдено
+          </div>
+        `;
+
+  }
 
 
-      document.getElementById("name").value = "";
-      document.getElementById("phone").value = "";
-      document.getElementById("address").value = "";
-      document.getElementById("time").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("price").value = "";
+  /* =========================================
+     ПРОЧЕЕ
+  ========================================= */
+
+  function callClient(phone) {
+
+    window.location.href =
+      "tel:" +
+      phone.replace(/[^\d+]/g,"");
+
+  }
 
 
-      showMain();
-    }
+  function openMap(address) {
+
+    window.open(
+      "https://www.google.com/maps/search/?api=1&query=" +
+      encodeURIComponent(address),
+      "_blank"
+    );
+
+  }
 
 
-    /* СЕГОДНЯ */
+  function showIncome() {
 
-    function showToday() {
-
-      hideAllScreens();
-
-      document
-        .getElementById("mainScreen")
-        .classList.remove("hidden");
-
-
-      const today = getToday();
-
-      const todayObjects =
-        objects.filter(
-          x => x.date === today
-        );
-
-
-      renderObjects(todayObjects);
-    }
-
-
-    /* КЛИЕНТЫ */
-
-    function showClients() {
-
-      hideAllScreens();
-
-      document
-        .getElementById("mainScreen")
-        .classList.remove("hidden");
-
-
-      renderObjects(objects);
-    }
-
-
-    /* ОТКРЫТЬ КАЛЕНДАРЬ */
-
-    function showCalendar() {
-
-      hideAllScreens();
-
-      document
-        .getElementById("calendarScreen")
-        .classList.remove("hidden");
-
-
-      const now = new Date();
-
-      calendarDate = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        1
-      );
-
-      selectedDate = getToday();
-
-      renderCalendar();
-    }
-
-
-    /* ОТРИСОВКА КАЛЕНДАРЯ */
-
-    function renderCalendar() {
-
-      const year =
-        calendarDate.getFullYear();
-
-      const month =
-        calendarDate.getMonth();
-
-
-      document.getElementById(
-        "calendarTitle"
-      ).textContent =
-        monthNames[month] + " " + year;
-
-
-      const grid =
-        document.getElementById(
-          "calendarGrid"
-        );
-
-
-      grid.innerHTML = "";
-
-
-      let firstDay =
-        new Date(
-          year,
-          month,
-          1
-        ).getDay();
-
-
-      if (firstDay === 0) {
-        firstDay = 7;
-      }
-
-
-      firstDay = firstDay - 1;
-
-
-      const daysInMonth =
-        new Date(
-          year,
-          month + 1,
+    const total =
+      jobs
+        .filter(j => j.status === "done")
+        .reduce(
+          (sum,j) =>
+            sum + Number(j.price || 0),
           0
-        ).getDate();
-
-
-      const daysInPreviousMonth =
-        new Date(
-          year,
-          month,
-          0
-        ).getDate();
-
-
-      /* ПРЕДЫДУЩИЙ МЕСЯЦ */
-
-      for (
-        let i = firstDay - 1;
-        i >= 0;
-        i--
-      ) {
-
-        const day =
-          daysInPreviousMonth - i;
-
-
-        let previousMonth =
-          month - 1;
-
-        let previousYear =
-          year;
-
-
-        if (previousMonth < 0) {
-          previousMonth = 11;
-          previousYear--;
-        }
-
-
-        const dateString =
-          formatDate(
-            previousYear,
-            previousMonth,
-            day
-          );
-
-
-        createDay(
-          day,
-          dateString,
-          true
-        );
-      }
-
-
-      /* ТЕКУЩИЙ МЕСЯЦ */
-
-      for (
-        let day = 1;
-        day <= daysInMonth;
-        day++
-      ) {
-
-        const dateString =
-          formatDate(
-            year,
-            month,
-            day
-          );
-
-
-        createDay(
-          day,
-          dateString,
-          false
-        );
-      }
-
-
-      /* СЛЕДУЮЩИЙ МЕСЯЦ */
-
-      const totalCells =
-        firstDay + daysInMonth;
-
-
-      const remaining =
-        totalCells % 7 === 0
-          ? 0
-          : 7 - (totalCells % 7);
-
-
-      for (
-        let day = 1;
-        day <= remaining;
-        day++
-      ) {
-
-        let nextMonth =
-          month + 1;
-
-        let nextYear =
-          year;
-
-
-        if (nextMonth > 11) {
-          nextMonth = 0;
-          nextYear++;
-        }
-
-
-        const dateString =
-          formatDate(
-            nextYear,
-            nextMonth,
-            day
-          );
-
-
-        createDay(
-          day,
-          dateString,
-          true
-        );
-      }
-
-
-      renderSelectedDate();
-    }
-
-
-    /* СОЗДАНИЕ ДНЯ */
-
-    function createDay(
-      dayNumber,
-      dateString,
-      otherMonth
-    ) {
-
-      const button =
-        document.createElement("button");
-
-
-      button.className = "day";
-
-      button.textContent =
-        dayNumber;
-
-
-      if (otherMonth) {
-        button.classList.add(
-          "other-month"
-        );
-      }
-
-
-      if (dateString === getToday()) {
-        button.classList.add(
-          "today"
-        );
-      }
-
-
-      if (dateString === selectedDate) {
-        button.classList.add(
-          "selected"
-        );
-      }
-
-
-      const hasObject =
-        objects.some(
-          object =>
-            object.date === dateString
         );
 
 
-      if (hasObject) {
-        button.classList.add(
-          "has-object"
-        );
-      }
+    alert(
+      "Доход по завершённым монтажам:\n\n" +
+      money(total)
+    );
+
+  }
 
 
-      button.onclick = function() {
+  function showStatistics() {
 
-        selectedDate =
-          dateString;
+    const total =
+      jobs.length;
 
+    const done =
+      jobs.filter(j => j.status === "done").length;
 
-        const parts =
-          dateString.split("-");
+    const planned =
+      jobs.filter(j => j.status === "planned").length;
 
-
-        const clickedYear =
-          Number(parts[0]);
-
-        const clickedMonth =
-          Number(parts[1]) - 1;
+    const upcoming =
+      jobs.filter(j => j.status === "upcoming").length;
 
 
-        calendarDate =
-          new Date(
-            clickedYear,
-            clickedMonth,
-            1
-          );
+    alert(
+
+      "Статистика:\n\n" +
+
+      "Всего монтажей: " + total + "\n" +
+
+      "Запланировано: " + planned + "\n" +
+
+      "Предстоящих: " + upcoming + "\n" +
+
+      "Завершено: " + done
+
+    );
+
+  }
 
 
-        renderCalendar();
-      };
+  function showSettings() {
+
+    alert(
+      "Настройки подключим следующим этапом."
+    );
+
+  }
 
 
+  function filterClients() {
+
+    const query =
       document
-        .getElementById("calendarGrid")
-        .appendChild(button);
+        .getElementById("clientSearch")
+        .value
+        .toLowerCase();
+
+
+    const clients = {};
+
+
+    jobs.forEach(job => {
+
+      const key =
+        job.phone || job.name;
+
+
+      if(!clients[key]) {
+
+        clients[key] = {
+
+          name: job.name,
+
+          phone: job.phone,
+
+          jobs: []
+
+        };
+
+      }
+
+
+      clients[key].jobs.push(job);
+
+    });
+
+
+    const list =
+      Object.values(clients)
+      .filter(client =>
+
+        (
+          client.name +
+          " " +
+          client.phone
+        )
+        .toLowerCase()
+        .includes(query)
+
+      );
+
+
+    document.getElementById("clientsList").innerHTML =
+      clientCards(list);
+
+  }
+
+
+  function showClientHistory(name) {
+
+    currentStatus = "done";
+
+    currentPage = "jobs";
+
+
+    document
+      .querySelectorAll(".bottom-button")
+      .forEach(button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page === "jobs"
+        );
+
+      });
+
+
+    const history =
+      jobs.filter(
+        j =>
+          j.name === name &&
+          j.status === "done"
+      );
+
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        История: ${name}
+      </div>
+
+
+      ${
+        history.length
+          ? history.map(jobCard).join("")
+          : `
+            <div class="empty">
+              Завершённых монтажей нет
+            </div>
+          `
+      }
+
+    `;
+
+  }
+
+
+  function renderCurrentPage() {
+
+    if(currentPage === "home") {
+
+      renderHome();
+
     }
 
+    else if(currentPage === "jobs") {
 
-    /* ПРЕДЫДУЩИЙ МЕСЯЦ */
+      renderJobs();
 
-    function previousMonth() {
+    }
 
-      calendarDate.setMonth(
-        calendarDate.getMonth() - 1
-      );
+    else if(currentPage === "calendar") {
 
       renderCalendar();
+
     }
 
+    else if(currentPage === "clients") {
 
-    /* СЛЕДУЮЩИЙ МЕСЯЦ */
+      renderClients();
 
-    function nextMonth() {
-
-      calendarDate.setMonth(
-        calendarDate.getMonth() + 1
-      );
-
-      renderCalendar();
     }
 
+    else if(currentPage === "search") {
 
-    /* СЕГОДНЯ */
+      renderSearch();
 
-    function goToToday() {
-
-      const now = new Date();
-
-
-      calendarDate =
-        new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          1
-        );
-
-
-      selectedDate =
-        getToday();
-
-
-      renderCalendar();
     }
 
+  }
 
-    /* ОБЪЕКТЫ ВЫБРАННОЙ ДАТЫ */
 
-    function renderSelectedDate() {
+  /* =========================================
+     TELEGRAM USER
+  ========================================= */
 
-      document.getElementById(
-        "selectedDateTitle"
-      ).textContent =
-        formatDateForTitle(
-          selectedDate
-        );
+  if(tg?.initDataUnsafe?.user) {
 
+    const user =
+      tg.initDataUnsafe.user;
 
-      const selectedObjects =
-        objects.filter(
-          object =>
-            object.date === selectedDate
-        );
 
+    document.getElementById("hello").textContent =
+      "Привет, " +
+      (user.first_name || "монтажник") +
+      "!";
 
-      const container =
-        document.getElementById(
-          "calendarObjects"
-        );
 
+    document.getElementById("avatar").textContent =
+      (
+        user.first_name || "М"
+      )[0].toUpperCase();
 
-      container.innerHTML = "";
+  }
 
 
-      if (!selectedObjects.length) {
+  /* =========================================
+     СТАРТ
+  ========================================= */
 
-        container.innerHTML =
-          '<div class="calendar-empty">' +
-          'На эту дату объектов нет' +
-          '</div>';
+  renderHome();
 
-        return;
-      }
-
-
-      renderObjectsInto(
-        selectedObjects,
-        container
-      );
-    }
-
-
-    /* ОТОБРАЖЕНИЕ ОБЪЕКТОВ */
-
-    function renderObjects(list) {
-
-      const container =
-        document.getElementById(
-          "objects"
-        );
-
-
-      renderObjectsInto(
-        list,
-        container
-      );
-    }
-
-
-    function renderObjectsInto(
-      list,
-      container
-    ) {
-
-      container.innerHTML = "";
-
-
-      if (!list.length) {
-
-        container.innerHTML =
-          '<div class="empty">' +
-          'Объектов пока нет' +
-          '</div>';
-
-        return;
-      }
-
-
-      list.forEach(
-        (object) => {
-
-          const realIndex =
-            objects.indexOf(object);
-
-
-          const card =
-            document.createElement("div");
-
-
-          card.className = "card";
-
-
-          card.innerHTML = `
-
-            <div class="time">
-              ${object.time || "Время не указано"}
-            </div>
-
-            <div class="name">
-              ${object.name}
-            </div>
-
-            <div class="info">
-
-              📍 ${object.address}<br>
-
-              📞 ${
-                object.phone ||
-                "Телефон не указан"
-              }<br>
-
-              🔧 ${object.type}<br>
-
-              📝 ${
-                object.description ||
-                "Без описания"
-              }<br>
-
-              💰 ${
-                object.price
-                  ? object.price + " ₽"
-                  : "Цена не указана"
-              }<br>
-
-              💳 ${object.payment}
-
-            </div>
-
-            <button
-              onclick="deleteObject(${realIndex})"
-              style="
-                margin-top:14px;
-                width:100%;
-                background:#f1f1f1;
-                color:#d11;
-                border:0;
-                border-radius:12px;
-                padding:12px;
-                font-size:15px;
-              "
-            >
-              🗑 Удалить объект
-            </button>
-
-          `;
-
-
-          container.appendChild(card);
-        }
-      );
-    }
-
-
-    /* УДАЛЕНИЕ */
-
-    function deleteObject(index) {
-
-      const object =
-        objects[index];
-
-
-      if (!object) {
-        return;
-      }
-
-
-      const confirmed =
-        confirm(
-          "Удалить объект " +
-          object.name +
-          "?\n\n" +
-          "Это действие нельзя отменить."
-        );
-
-
-      if (!confirmed) {
-        return;
-      }
-
-
-      objects.splice(
-        index,
-        1
-      );
-
-
-      localStorage.setItem(
-        "objects",
-        JSON.stringify(objects)
-      );
-
-
-      if (
-        !document
-          .getElementById(
-            "calendarScreen"
-          )
-          .classList.contains("hidden")
-      ) {
-
-        renderCalendar();
-
-      } else {
-
-        showToday();
-      }
-    }
-
-
-    /* ПЕРВОНАЧАЛЬНЫЙ ЗАПУСК */
-
-    showToday();
-
-  </script>
+</script>
 
 </body>
 </html>
