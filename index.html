@@ -43,6 +43,7 @@
       padding: 15px;
       font-size: 16px;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .main-button {
@@ -54,6 +55,12 @@
     .secondary {
       background: white;
       border: 1px solid #ddd;
+    }
+
+    .calendar-button {
+      background: white;
+      border: 1px solid #ddd;
+      grid-column: span 2;
     }
 
     .card {
@@ -116,284 +123,86 @@
       color: white;
       width: 100%;
     }
-  </style>
-</head>
-
-<body>
-
-  <div id="mainScreen">
-
-    <h1>Журнал монтажника</h1>
-    <div class="subtitle">Клиенты и объекты</div>
-
-    <div class="buttons">
-      <button class="main-button" onclick="showAdd()">
-        ＋ Добавить объект
-      </button>
-
-      <button class="secondary" onclick="showToday()">
-        📅 Сегодня
-      </button>
-
-      <button class="secondary" onclick="showClients()">
-        👥 Клиенты
-      </button>
-    </div>
-
-    <div id="objects"></div>
-
-  </div>
 
 
-  <div id="addScreen" class="hidden">
+    /* =========================
+       КАЛЕНДАРЬ
+       ========================= */
 
-    <button class="back" onclick="showMain()">← Назад</button>
-
-    <h1>Новый объект</h1>
-
-    <br>
-
-    <input id="name" placeholder="ФИО клиента">
-
-    <input id="phone" type="tel" placeholder="Телефон">
-
-    <input id="address" placeholder="Адрес объекта">
-
-    <input id="date" type="date">
-
-    <input id="time" type="time">
-
-    <select id="type">
-      <option>Видеонаблюдение</option>
-      <option>Домофон</option>
-      <option>Видеонаблюдение + домофон</option>
-      <option>Ремонт / обслуживание</option>
-    </select>
-
-    <textarea id="description"
-      placeholder="Что установлено или что делали"></textarea>
-
-    <input id="price"
-      type="number"
-      placeholder="Стоимость, ₽">
-
-    <select id="payment">
-      <option>Не указано</option>
-      <option>Наличные</option>
-      <option>Перевод</option>
-    </select>
-
-    <button class="save" onclick="saveObject()">
-      Сохранить объект
-    </button>
-
-  </div>
-
-
-  <script>
-
-    const tg = window.Telegram.WebApp;
-
-    tg.ready();
-    tg.expand();
-
-
-    let objects = JSON.parse(
-      localStorage.getItem("objects") || "[]"
-    );
-
-
-    function showMain() {
-
-      document.getElementById("mainScreen")
-        .classList.remove("hidden");
-
-      document.getElementById("addScreen")
-        .classList.add("hidden");
-
-      showToday();
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
     }
 
-
-    function showAdd() {
-
-      document.getElementById("mainScreen")
-        .classList.add("hidden");
-
-      document.getElementById("addScreen")
-        .classList.remove("hidden");
-
-      document.getElementById("date").value =
-        new Date().toISOString().split("T")[0];
+    .calendar-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
     }
 
-
-    function saveObject() {
-
-      const object = {
-
-        name: document.getElementById("name").value,
-
-        phone: document.getElementById("phone").value,
-
-        address: document.getElementById("address").value,
-
-        date: document.getElementById("date").value,
-
-        time: document.getElementById("time").value,
-
-        type: document.getElementById("type").value,
-
-        description:
-          document.getElementById("description").value,
-
-        price:
-          document.getElementById("price").value,
-
-        payment:
-          document.getElementById("payment").value
-
-      };
-
-
-      if (!object.name || !object.address) {
-
-        alert("Заполни ФИО и адрес объекта");
-
-        return;
-      }
-
-
-      objects.push(object);
-
-      localStorage.setItem(
-        "objects",
-        JSON.stringify(objects)
-      );
-
-
-      alert("Объект сохранён");
-
-      document.getElementById("name").value = "";
-      document.getElementById("phone").value = "";
-      document.getElementById("address").value = "";
-      document.getElementById("time").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("price").value = "";
-
-      showMain();
-
+    .month-button {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      background: white;
+      border: 1px solid #ddd;
+      font-size: 22px;
     }
 
-
-    function showToday() {
-
-      const today =
-        new Date().toISOString().split("T")[0];
-
-      const todayObjects =
-        objects.filter(x => x.date === today);
-
-      renderObjects(todayObjects);
+    .today-button {
+      width: 100%;
+      background: white;
+      border: 1px solid #ddd;
+      margin-bottom: 15px;
     }
 
-
-    function showClients() {
-
-      renderObjects(objects);
+    .calendar {
+      background: white;
+      border-radius: 18px;
+      padding: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
     }
 
+    .weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
 
-    function renderObjects(list) {
+    .weekday {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 8px 0;
+      font-weight: 600;
+    }
 
-  const container = document.getElementById("objects");
+    .day {
+      position: relative;
+      height: 48px;
+      margin: 2px;
+      padding: 0;
+      border-radius: 12px;
+      background: transparent;
+      font-size: 15px;
+    }
 
-  container.innerHTML = "";
+    .day:active {
+      background: #eee;
+    }
 
-  if (!list.length) {
-    container.innerHTML =
-      '<div class="empty">Объектов пока нет</div>';
-    return;
-  }
+    .day.other-month {
+      color: #bbb;
+    }
 
-  list.forEach((object) => {
+    .day.today {
+      background: #222;
+      color: white;
+    }
 
-    const realIndex = objects.indexOf(object);
-
-    const card = document.createElement("div");
-
-    card.className = "card";
-
-    card.innerHTML = `
-
-      <div class="time">
-        ${object.time || "Время не указано"}
-      </div>
-
-      <div class="name">
-        ${object.name}
-      </div>
-
-      <div class="info">
-        📍 ${object.address}<br>
-        📞 ${object.phone || "Телефон не указан"}<br>
-        🔧 ${object.type}<br>
-        📝 ${object.description || "Без описания"}<br>
-        💰 ${object.price ? object.price + " ₽" : "Цена не указана"}<br>
-        💳 ${object.payment}
-      </div>
-
-      <button
-        onclick="deleteObject(${realIndex})"
-        style="
-          margin-top:14px;
-          width:100%;
-          background:#f1f1f1;
-          color:#d11;
-          border:0;
-          border-radius:12px;
-          padding:12px;
-          font-size:15px;
-        "
-      >
-        🗑 Удалить объект
-      </button>
-
-    `;
-
-    container.appendChild(card);
-
-  });
-
-}
-function deleteObject(index) {
-
-  const object = objects[index];
-
-  if (!object) {
-    return;
-  }
-
-  const confirmed = confirm(
-    "Удалить объект " +
-    object.name +
-    "?\n\nЭто действие нельзя отменить."
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  objects.splice(index, 1);
-
-  localStorage.setItem(
-    "objects",
-    JSON.stringify(objects)
-  );
-
-  showToday();
-}
-  </script>
-
-</body>
-</html>
+    .day.selected {
+      outline: 2px solid #222;
+      outline-offset: -2
