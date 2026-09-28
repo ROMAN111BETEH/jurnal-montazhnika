@@ -7,8 +7,6 @@
   <title>Журнал монтажника</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- SUPABASE: библиотека базы данных -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -726,11 +724,66 @@
   const SUPABASE_URL = "https://hucvbjjztyemdwevxoot.supabase.co";
   const SUPABASE_KEY = "sb_publishable_xh3SWweIBq70kbTNcFDaJw_ZnkfWzbx";
 
-  const supabase =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+  // Работаем напрямую через REST API Supabase.
+  // Это убирает зависимость от отдельного CDN-скрипта.
+  async function supabaseRequest(path, options = {}) {
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
+    try {
+
+      const response = await fetch(
+        SUPABASE_URL + "/rest/v1/" + path,
+        {
+          ...options,
+          signal: controller.signal,
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            ...(options.headers || {})
+          }
+        }
+      );
+
+      const raw = await response.text();
+      let data = null;
+
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      }
+      catch (_) {
+        data = raw;
+      }
+
+      if (!response.ok) {
+        const message =
+          data?.message ||
+          data?.error_description ||
+          data?.hint ||
+          (typeof data === "string" ? data : "Supabase HTTP " + response.status);
+
+        throw new Error(message);
+      }
+
+      return data;
+
+    }
+    catch (error) {
+
+      if (error?.name === "AbortError") {
+        throw new Error("Supabase не ответил за 12 секунд. Проверь интернет и настройки базы.");
+      }
+
+      throw error;
+
+    }
+    finally {
+      clearTimeout(timeout);
+    }
+  }
 
 
   /* ===========================
@@ -765,23 +818,14 @@
       );
     }
 
+    const query =
+      "jobs?select=*" +
+      "&telegram_id=eq." + encodeURIComponent(TELEGRAM_USER_ID) +
+      "&order=date.asc&order=time.asc";
 
-    const { data, error } =
-      await supabase
-        .from("jobs")
-        .select("*")
-        .eq("telegram_id", TELEGRAM_USER_ID)
-        .order("date", { ascending: true })
-        .order("time", { ascending: true });
+    const data = await supabaseRequest(query);
 
-
-    if (error) {
-      console.error("Supabase load error:", error);
-      throw error;
-    }
-
-
-    jobs = data || [];
+    jobs = Array.isArray(data) ? data : [];
 
   }
 
@@ -792,23 +836,24 @@
 
   async function createJob(data) {
 
-    const { data: createdJob, error } =
-      await supabase
-        .from("jobs")
-        .insert({
+    const result =
+      await supabaseRequest("jobs", {
+        method: "POST",
+        headers: {
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
           telegram_id: TELEGRAM_USER_ID,
           ...data,
           status: "planned"
         })
-        .select()
-        .single();
+      });
 
+    const createdJob = Array.isArray(result) ? result[0] : result;
 
-    if (error) {
-      console.error("Supabase insert error:", error);
-      throw error;
+    if (!createdJob) {
+      throw new Error("Supabase не вернул созданный монтаж.");
     }
-
 
     jobs.push(createdJob);
 
@@ -823,30 +868,31 @@
 
   async function updateJob(id, data) {
 
-    const { data: updatedJob, error } =
-      await supabase
-        .from("jobs")
-        .update(data)
-        .eq("id", id)
-        .eq("telegram_id", TELEGRAM_USER_ID)
-        .select()
-        .single();
+    const query =
+      "jobs?id=eq." + encodeURIComponent(id) +
+      "&telegram_id=eq." + encodeURIComponent(TELEGRAM_USER_ID);
 
+    const result =
+      await supabaseRequest(query, {
+        method: "PATCH",
+        headers: {
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify(data)
+      });
 
-    if (error) {
-      console.error("Supabase update error:", error);
-      throw error;
+    const updatedJob = Array.isArray(result) ? result[0] : result;
+
+    if (!updatedJob) {
+      throw new Error("Монтаж не найден или не удалось его изменить.");
     }
-
 
     const index =
       jobs.findIndex(j => Number(j.id) === Number(id));
 
-
     if (index !== -1) {
       jobs[index] = updatedJob;
     }
-
 
     return updatedJob;
 
@@ -859,19 +905,16 @@
 
   async function removeJob(id) {
 
-    const { error } =
-      await supabase
-        .from("jobs")
-        .delete()
-        .eq("id", id)
-        .eq("telegram_id", TELEGRAM_USER_ID);
+    const query =
+      "jobs?id=eq." + encodeURIComponent(id) +
+      "&telegram_id=eq." + encodeURIComponent(TELEGRAM_USER_ID);
 
-
-    if (error) {
-      console.error("Supabase delete error:", error);
-      throw error;
-    }
-
+    await supabaseRequest(query, {
+      method: "DELETE",
+      headers: {
+        "Prefer": "return=minimal"
+      }
+    });
 
     jobs =
       jobs.filter(j => Number(j.id) !== Number(id));
@@ -2187,54 +2230,42 @@
         j => (j.phone || j.name) === identifier
       );
 
-
     if (!client) return;
-
 
     const clientJobs =
       jobs.filter(
         j => (j.phone || j.name) === identifier
       );
 
-
     const confirmed = confirm(
-
       `Удалить клиента «${client.name}»?\n\n` +
-
       `Будет удалено монтажей: ${clientJobs.length}\n\n` +
-
       `Вместе с ними удалится вся история этого клиента.\n\n` +
-
       `Это действие нельзя отменить.`
-
     );
-
 
     if (!confirmed) return;
 
+    const ids = clientJobs.map(j => j.id);
+    if (!ids.length) return;
 
-    const ids =
-      clientJobs.map(j => j.id);
-
+    const query =
+      "jobs?id=in.(" + ids.map(id => encodeURIComponent(id)).join(",") + ")" +
+      "&telegram_id=eq." + encodeURIComponent(TELEGRAM_USER_ID);
 
     try {
 
-      const { error } =
-        await supabase
-          .from("jobs")
-          .delete()
-          .in("id", ids)
-          .eq("telegram_id", TELEGRAM_USER_ID);
-
-
-      if (error) throw error;
-
+      await supabaseRequest(query, {
+        method: "DELETE",
+        headers: {
+          "Prefer": "return=minimal"
+        }
+      });
 
       jobs =
         jobs.filter(
           j => (j.phone || j.name) !== identifier
         );
-
 
       renderClients();
 
@@ -2560,6 +2591,10 @@
     }
 
 
+    // Сначала сразу показываем интерфейс.
+    // База подгружается после этого, поэтому приложение не зависает на пустом экране.
+    renderHome();
+
     try {
 
       await loadJobs();
@@ -2580,6 +2615,12 @@
           <div style="margin-top:10px;font-size:11px;word-break:break-word;">
             ${escapeHtml(error.message || "Неизвестная ошибка")}
           </div>
+          <button
+            style="margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:#248cff;color:white;font-weight:700;"
+            onclick="startApp()"
+          >
+            Повторить подключение
+          </button>
         </div>
       `;
 
