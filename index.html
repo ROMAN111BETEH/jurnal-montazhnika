@@ -7,6 +7,8 @@
   <title>Журнал монтажника</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- SUPABASE: библиотека базы данных -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -709,54 +711,187 @@
 
 
   /* ===========================
-     ДЕМО-ДАННЫЕ
+     SUPABASE — НАСТРОЙКИ
   =========================== */
 
-  let jobs = [
+  // ============================================================
+  // 🔴 ВСТАВЬ СЮДА ДАННЫЕ ИЗ SUPABASE
+  //
+  // SUPABASE_URL: Project URL
+  // SUPABASE_KEY: Publishable key (или старый anon key)
+  //
+  // НЕ вставляй сюда secret/service_role key!
+  // ============================================================
 
-    {
-      id: 1,
-      name: "Иван Петров",
-      phone: "+7 900 000-00-01",
-      address: "ул. Ленина, 15",
-      date: "2026-09-28",
-      time: "10:00",
-      type: "Видеонаблюдение",
-      description: "Установка 4 камер и регистратора",
-      price: 35000,
-      payment: "Не оплачено",
-      status: "planned"
-    },
+  const SUPABASE_URL = "https://hucvbjjztyemdwevxoot.supabase.co/rest/v1/";
+  const SUPABASE_KEY = "sb_publishable_xh3SWweIBq70kbTNcFDaJw_ZnkfWzbx";
 
-    {
-      id: 2,
-      name: "ООО Вектор",
-      phone: "+7 900 000-00-02",
-      address: "ул. Советская, 24",
-      date: "2026-09-29",
-      time: "14:30",
-      type: "Видеонаблюдение и домофон",
-      description: "Монтаж системы на входе",
-      price: 48000,
-      payment: "Перевод",
-      status: "upcoming"
-    },
+  const supabase =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
-    {
-      id: 3,
-      name: "Сергей",
-      phone: "+7 900 000-00-03",
-      address: "ул. Кирова, 8",
-      date: "2026-09-25",
-      time: "09:30",
-      type: "Домофон",
-      description: "Замена и настройка",
-      price: 18000,
-      payment: "Наличные",
-      status: "done"
+
+  /* ===========================
+     TELEGRAM USER ID
+  =========================== */
+
+  const telegramUser =
+    tg?.initDataUnsafe?.user || null;
+
+  const TELEGRAM_USER_ID =
+    telegramUser?.id ? Number(telegramUser.id) : null;
+
+
+  /* ===========================
+     ДАННЫЕ ПРИЛОЖЕНИЯ
+  =========================== */
+
+  // Теперь jobs загружается из Supabase,
+  // а не хранится только в памяти браузера.
+  let jobs = [];
+
+
+  /* ===========================
+     ЗАГРУЗКА МОНТАЖЕЙ ИЗ SUPABASE
+  =========================== */
+
+  async function loadJobs() {
+
+    if (!TELEGRAM_USER_ID) {
+      throw new Error(
+        "Не удалось определить Telegram ID. Открой приложение именно внутри Telegram."
+      );
     }
 
-  ];
+
+    const { data, error } =
+      await supabase
+        .from("jobs")
+        .select("*")
+        .eq("telegram_id", TELEGRAM_USER_ID)
+        .order("date", { ascending: true })
+        .order("time", { ascending: true });
+
+
+    if (error) {
+      console.error("Supabase load error:", error);
+      throw error;
+    }
+
+
+    jobs = data || [];
+
+  }
+
+
+  /* ===========================
+     СОХРАНЕНИЕ НОВОГО МОНТАЖА
+  =========================== */
+
+  async function createJob(data) {
+
+    const { data: createdJob, error } =
+      await supabase
+        .from("jobs")
+        .insert({
+          telegram_id: TELEGRAM_USER_ID,
+          ...data,
+          status: "planned"
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      throw error;
+    }
+
+
+    jobs.push(createdJob);
+
+    return createdJob;
+
+  }
+
+
+  /* ===========================
+     ОБНОВЛЕНИЕ МОНТАЖА
+  =========================== */
+
+  async function updateJob(id, data) {
+
+    const { data: updatedJob, error } =
+      await supabase
+        .from("jobs")
+        .update(data)
+        .eq("id", id)
+        .eq("telegram_id", TELEGRAM_USER_ID)
+        .select()
+        .single();
+
+
+    if (error) {
+      console.error("Supabase update error:", error);
+      throw error;
+    }
+
+
+    const index =
+      jobs.findIndex(j => Number(j.id) === Number(id));
+
+
+    if (index !== -1) {
+      jobs[index] = updatedJob;
+    }
+
+
+    return updatedJob;
+
+  }
+
+
+  /* ===========================
+     УДАЛЕНИЕ МОНТАЖА ИЗ SUPABASE
+  =========================== */
+
+  async function removeJob(id) {
+
+    const { error } =
+      await supabase
+        .from("jobs")
+        .delete()
+        .eq("id", id)
+        .eq("telegram_id", TELEGRAM_USER_ID);
+
+
+    if (error) {
+      console.error("Supabase delete error:", error);
+      throw error;
+    }
+
+
+    jobs =
+      jobs.filter(j => Number(j.id) !== Number(id));
+
+  }
+
+
+  /* ===========================
+     ПРОВЕРКА НАСТРОЕК SUPABASE
+  =========================== */
+
+  function supabaseConfigLooksEmpty() {
+
+    return
+      !SUPABASE_URL ||
+      !SUPABASE_KEY ||
+      SUPABASE_URL.includes("ВСТАВЬ_СЮДА") ||
+      SUPABASE_KEY.includes("ВСТАВЬ_СЮДА");
+
+  }
 
 
   let currentPage = "home";
@@ -1673,16 +1808,29 @@
   }
 
 
-  function changeStatus(id, status) {
+  async function changeStatus(id, status) {
 
     const job =
-      jobs.find(j => j.id === id);
+      jobs.find(j => Number(j.id) === Number(id));
 
     if (!job) return;
 
-    job.status = status;
 
-    renderCurrentPage();
+    try {
+
+      await updateJob(id, { status });
+
+      renderCurrentPage();
+
+    }
+    catch (error) {
+
+      alert(
+        "Не удалось изменить статус.\n\n" +
+        (error.message || "Ошибка Supabase")
+      );
+
+    }
 
   }
 
@@ -1710,11 +1858,20 @@
     if (!confirmed) return;
 
 
-    jobs =
-      jobs.filter(j => j.id !== id);
+    try {
 
+      await removeJob(id);
+      renderCurrentPage();
 
-    renderCurrentPage();
+    }
+    catch (error) {
+
+      alert(
+        "Не удалось удалить монтаж.\n\n" +
+        (error.message || "Ошибка Supabase")
+      );
+
+    }
 
   }
 
@@ -1855,7 +2012,7 @@
     .getElementById("jobForm")
     .addEventListener(
       "submit",
-      function(event) {
+      async function(event) {
 
         event.preventDefault();
 
@@ -1909,38 +2066,39 @@
         }
 
 
-        if (id) {
+        try {
 
-          const job =
-            jobs.find(j => j.id == id);
+          if (id) {
 
-          if (job) {
-            Object.assign(job, data);
+            await updateJob(id, data);
+
           }
 
+          else {
+
+            await createJob(data);
+
+          }
+
+
+          document
+            .getElementById("modal")
+            .classList.remove("open");
+
+
+          renderCurrentPage();
+
         }
+        catch (error) {
 
-        else {
+          console.error(error);
 
-          jobs.push({
-
-            id: Date.now(),
-
-            ...data,
-
-            status: "planned"
-
-          });
+          alert(
+            "Не удалось сохранить монтаж.\n\n" +
+            (error.message || "Ошибка Supabase")
+          );
 
         }
-
-
-        document
-          .getElementById("modal")
-          .classList.remove("open");
-
-
-        renderCurrentPage();
 
       }
     );
@@ -2022,7 +2180,7 @@
      УДАЛЕНИЕ КЛИЕНТА
   =========================== */
 
-  function deleteClient(identifier) {
+  async function deleteClient(identifier) {
 
     const client =
       jobs.find(
@@ -2055,13 +2213,42 @@
     if (!confirmed) return;
 
 
-    jobs =
-      jobs.filter(
-        j => (j.phone || j.name) !== identifier
+    const ids =
+      clientJobs.map(j => j.id);
+
+
+    try {
+
+      const { error } =
+        await supabase
+          .from("jobs")
+          .delete()
+          .in("id", ids)
+          .eq("telegram_id", TELEGRAM_USER_ID);
+
+
+      if (error) throw error;
+
+
+      jobs =
+        jobs.filter(
+          j => (j.phone || j.name) !== identifier
+        );
+
+
+      renderClients();
+
+    }
+    catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Не удалось удалить клиента.\n\n" +
+        (error.message || "Ошибка Supabase")
       );
 
-
-    renderClients();
+    }
 
   }
 
@@ -2342,10 +2529,66 @@
 
 
   /* ===========================
-     ЗАПУСК
+     ЗАПУСК ПРИЛОЖЕНИЯ
   =========================== */
 
-  renderHome();
+  async function startApp() {
+
+    if (supabaseConfigLooksEmpty()) {
+
+      alert(
+        "Supabase ещё не настроен.\n\n" +
+        "Открой код и вставь SUPABASE_URL и SUPABASE_KEY в отмеченное место."
+      );
+
+      renderHome();
+      return;
+
+    }
+
+
+    if (!TELEGRAM_USER_ID) {
+
+      alert(
+        "Не найден Telegram ID.\n\n" +
+        "Открой приложение через Telegram Mini App."
+      );
+
+      renderHome();
+      return;
+
+    }
+
+
+    try {
+
+      await loadJobs();
+      renderHome();
+
+    }
+    catch (error) {
+
+      console.error(error);
+
+      document.getElementById("content").innerHTML = `
+        <div class="empty">
+          <div style="font-size:30px;margin-bottom:10px;">⚠️</div>
+          <b>Не удалось загрузить данные</b>
+          <div style="margin-top:8px;font-size:12px;">
+            Проверь настройки Supabase, таблицу jobs и RLS.
+          </div>
+          <div style="margin-top:10px;font-size:11px;word-break:break-word;">
+            ${escapeHtml(error.message || "Неизвестная ошибка")}
+          </div>
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  startApp();
 
 </script>
 
