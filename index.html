@@ -23,6 +23,60 @@
       --green: #27a866;
       --orange: #f2a33a;
       --red: #df6262;
+      --input-bg: #fafbfc;
+      --soft-bg: #f0f2f4;
+      --tab-bg: #e8ecf0;
+    }
+
+    body.dark-theme {
+      --bg: #11161c;
+      --card: #1b222b;
+      --text: #f2f5f8;
+      --muted: #9aa6b2;
+      --line: #303a45;
+      --input-bg: #151b22;
+      --soft-bg: #252e38;
+      --tab-bg: #202832;
+    }
+
+    body.dark-theme .job-info { color: #b8c1ca; }
+    body.dark-theme .job-description { color: #a9b3bd; }
+    body.dark-theme .day { background: #171e26; color: var(--text); }
+    body.dark-theme .day.has-job { background: #182c3e; }
+    body.dark-theme .bottom-menu { background: rgba(27,34,43,.97); }
+    body.dark-theme .form input,
+    body.dark-theme .form select,
+    body.dark-theme .form textarea { background: var(--input-bg); color: var(--text); }
+    body.dark-theme .cancel,
+    body.dark-theme .job-actions button,
+    body.dark-theme .calendar-header button { background: var(--soft-bg); color: var(--text); }
+
+    .settings-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 15px;
+    }
+
+    .theme-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .theme-option {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--soft-bg);
+      color: var(--text);
+      padding: 13px;
+      font-weight: 800;
+    }
+
+    .theme-option.active {
+      border-color: var(--blue);
+      outline: 2px solid rgba(36,140,255,.18);
     }
 
     body {
@@ -148,8 +202,13 @@
 
     .new-button {
       background: var(--blue);
-      color: white;
+      color: #fff;
       border-color: var(--blue);
+    }
+
+    .new-button .menu-title,
+    .new-button .menu-description {
+      color: #fff;
     }
 
     /* SECTION */
@@ -166,7 +225,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 5px;
-      background: #e8ecf0;
+      background: var(--tab-bg);
       padding: 4px;
       border-radius: 13px;
       margin-bottom: 12px;
@@ -183,7 +242,7 @@
     }
 
     .status-tab.active {
-      background: white;
+      background: var(--card);
       color: var(--text);
       box-shadow: 0 1px 4px rgba(0,0,0,.08);
     }
@@ -191,7 +250,7 @@
     /* JOB CARD */
 
     .job-card {
-      background: white;
+      background: var(--card);
       border: 1px solid var(--line);
       border-radius: 17px;
       padding: 15px;
@@ -268,7 +327,7 @@
     }
 
     .job-actions button {
-      background: #f0f2f4;
+      background: var(--soft-bg);
       color: #29333d;
       border: 0;
       border-radius: 10px;
@@ -295,7 +354,7 @@
     /* CALENDAR */
 
     .calendar {
-      background: white;
+      background: var(--card);
       border: 1px solid var(--line);
       border-radius: 17px;
       padding: 12px;
@@ -314,7 +373,7 @@
       width: 36px;
       height: 36px;
       border: 0;
-      background: #f0f2f4;
+      background: var(--soft-bg);
       border-radius: 10px;
       font-size: 20px;
     }
@@ -342,7 +401,7 @@
       min-height: 43px;
       border: 0;
       border-radius: 9px;
-      background: #fafbfc;
+      background: var(--input-bg);
       font-size: 12px;
       position: relative;
     }
@@ -370,7 +429,7 @@
     .empty {
       text-align: center;
       color: var(--muted);
-      background: white;
+      background: var(--card);
       border: 1px dashed #d7dce1;
       border-radius: 16px;
       padding: 28px 12px;
@@ -382,7 +441,7 @@
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: white;
+      background: var(--card);
       padding: 12px;
       outline: none;
       margin-bottom: 12px;
@@ -443,7 +502,7 @@
     }
 
     .modal-content {
-      background: white;
+      background: var(--card);
       width: 100%;
       max-width: 760px;
       margin: auto auto 0;
@@ -478,7 +537,7 @@
       padding: 12px;
       border: 1px solid var(--line);
       border-radius: 11px;
-      background: #fafbfc;
+      background: var(--input-bg);
       color: var(--text);
       outline: none;
     }
@@ -795,6 +854,13 @@
 
   const TELEGRAM_USER_ID =
     telegramUser?.id ? Number(telegramUser.id) : null;
+
+  // 🔐 Единственный разрешённый Telegram ID
+  const ALLOWED_TELEGRAM_ID = 1300645320;
+
+  function isAuthorizedTelegramUser() {
+    return TELEGRAM_USER_ID === ALLOWED_TELEGRAM_ID;
+  }
 
 
   /* ===========================
@@ -1988,6 +2054,19 @@
   }
 
 
+  function openNewJobForClient(name, phone) {
+
+    openNewJob();
+
+    document.getElementById("name").value =
+      name || "";
+
+    document.getElementById("phone").value =
+      phone || "";
+
+  }
+
+
   function editJob(id) {
 
     const job =
@@ -2302,6 +2381,13 @@
       });
 
 
+    const client =
+      jobs.find(j => j.name === name);
+
+    const clientPhone =
+      client?.phone || "";
+
+
     const history =
       jobs.filter(
         j =>
@@ -2315,6 +2401,16 @@
       <div class="section-title">
         История: ${escapeHtml(name)}
       </div>
+
+      <button
+        class="menu-button new-button"
+        style="width:100%;min-height:auto;margin-bottom:12px;"
+        onclick="openNewJobForClient('${escapeAttribute(name)}','${escapeAttribute(clientPhone)}')"
+      >
+        <span class="menu-icon">➕</span>
+        <span class="menu-title">Добавить монтаж</span>
+        <span class="menu-description">Новый монтаж для этого клиента</span>
+      </button>
 
 
       ${
@@ -2401,9 +2497,20 @@
 
   function callClient(phone) {
 
-    window.location.href =
-      "tel:" +
-      phone.replace(/[^\d+]/g,"");
+    const cleanPhone =
+      String(phone || "").replace(/[^\d+]/g, "");
+
+    if (!cleanPhone) {
+      alert("Номер телефона не указан.");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = "tel:" + cleanPhone;
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 
   }
 
@@ -2470,11 +2577,85 @@
   }
 
 
+  function applyTheme(theme) {
+
+    const isDark = theme === "dark";
+
+    document.body.classList.toggle("dark-theme", isDark);
+    localStorage.setItem("journal_theme", isDark ? "dark" : "light");
+
+    if (tg?.setHeaderColor) {
+      tg.setHeaderColor(isDark ? "#11161c" : "#f4f6f8");
+    }
+
+    if (tg?.setBackgroundColor) {
+      tg.setBackgroundColor(isDark ? "#11161c" : "#f4f6f8");
+    }
+
+  }
+
+
+  function initTheme() {
+
+    applyTheme(
+      localStorage.getItem("journal_theme") || "light"
+    );
+
+  }
+
+
   function showSettings() {
 
-    alert(
-      "Настройки подключим следующим этапом."
-    );
+    currentPage = "settings";
+
+    const currentTheme =
+      localStorage.getItem("journal_theme") || "light";
+
+    document.getElementById("content").innerHTML = `
+
+      <div class="section-title">
+        Настройки
+      </div>
+
+      <div class="settings-card">
+
+        <div style="font-size:16px;font-weight:800;">
+          Тема приложения
+        </div>
+
+        <div style="margin-top:5px;color:var(--muted);font-size:12px;">
+          Выбери светлую или тёмную тему
+        </div>
+
+        <div class="theme-options">
+
+          <button
+            class="theme-option ${currentTheme === "light" ? "active" : ""}"
+            onclick="setTheme('light')"
+          >
+            ☀️ Светлая
+          </button>
+
+          <button
+            class="theme-option ${currentTheme === "dark" ? "active" : ""}"
+            onclick="setTheme('dark')"
+          >
+            🌙 Тёмная
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  function setTheme(theme) {
+
+    applyTheme(theme);
+    showSettings();
 
   }
 
@@ -2503,6 +2684,10 @@
 
     else if (currentPage === "search") {
       renderSearch();
+    }
+
+    else if (currentPage === "settings") {
+      showSettings();
     }
 
   }
@@ -2564,6 +2749,38 @@
   =========================== */
 
   async function startApp() {
+
+    initTheme();
+
+    if (!TELEGRAM_USER_ID) {
+
+      document.getElementById("content").innerHTML = `
+        <div class="empty">
+          <div style="font-size:30px;margin-bottom:10px;">🔒</div>
+          <b>Доступ только через Telegram</b>
+          <div style="margin-top:8px;font-size:12px;">
+            Открой приложение из Telegram.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    if (!isAuthorizedTelegramUser()) {
+
+      document.getElementById("content").innerHTML = `
+        <div class="empty">
+          <div style="font-size:30px;margin-bottom:10px;">⛔</div>
+          <b>Доступ запрещён</b>
+          <div style="margin-top:8px;font-size:12px;">
+            Этот Telegram-аккаунт не имеет доступа к приложению.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
 
     if (supabaseConfigLooksEmpty()) {
 
