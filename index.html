@@ -2505,15 +2505,9 @@
       return;
     }
 
-    const link = document.createElement("a");
-    link.href = "tel:" + cleanPhone;
-    link.rel = "noopener";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    window.location.href = "tel:" + cleanPhone;
 
   }
-
 
   function openMap(address) {
 
